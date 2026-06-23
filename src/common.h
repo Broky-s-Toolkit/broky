@@ -1,12 +1,4 @@
 #pragma once
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <raylib.h>
-#include <rlgl.h>
-#include <raymath.h>
-
 #define ART_ROOT        "art"
 #define BROKY_ART_ROOT  ART_ROOT        "/broky"
 #define BROKY_AI_ROOT   BROKY_ART_ROOT  "/ai"

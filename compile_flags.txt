@@ -1,0 +1,4 @@
+-I/home/dacanizares/source/broky/src
+-I/home/dacanizares/source/broky/lib/rayext
+-I/usr/local/include
+-std=c99

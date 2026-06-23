@@ -1,5 +1,6 @@
 #define NON_EDITOR_BUILD 1
 #define IMPLEMENT_ALL 1
+#include "string.h"
 #include "common.h"
 #include "game/main.h"
 #include "lab.h"
