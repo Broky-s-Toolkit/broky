@@ -1,0 +1,3 @@
+[submodule "art/broky"]
+	path = art/broky
+	url = https://github.com/Broky-s-Toolkit/art.git
