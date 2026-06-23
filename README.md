@@ -21,12 +21,12 @@ ES: [Guía de instalacion](https://thescienceofcode.com/es/raylib-vscode-c-cpp-d
 **Folders use 3-letter prefixes (except root):**
 
 ```
-art     →  assets
-bin     →  dbg-OS / rel-OS builds (linux/win)
-lib     →  third-party libraries
-src     →  source code
-run     →  build / execution scripts (TODO: migrate all build scripts here)
-tmp     →  temporary build folder
+art     assets
+bin     dbg-OS / rel-OS builds (linux/win)
+lib     internal libraries (3rd subfolder for externals)
+src     source code
+run     build / execution scripts (TODO: migrate all build scripts here)
+tmp     temporary build folder
 ```
 
 ### src
