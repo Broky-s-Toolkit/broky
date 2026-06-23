@@ -91,7 +91,7 @@ GAME_State GAME_MakeState(void)
 
 typedef struct {
     bool checkbox_value;
-    bool font_toggle;
+    EGUI_Font demo_font;
     char input_contents[256];
     char input_int_contents[256];
     char input_float_contents[256];
@@ -101,7 +101,7 @@ GAME_WindowState GAME_MakeWindowState()
 {
     GAME_WindowState state      = {
         .checkbox_value         = true,
-        .font_toggle            = false,
+        .demo_font              = EGUI_Font_Default,
         .input_contents         = {'\0'},
         .input_int_contents     = {'\0'},
         .input_float_contents   = {'\0'}

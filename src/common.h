@@ -7,10 +7,11 @@
 #include <rlgl.h>
 #include <raymath.h>
 
-#define BROKY_ART_ROOT "art/broky"
-#define BROKY_AI_ROOT  BROKY_ART_ROOT "/ai"
-#define BROKY_FNT_ROOT BROKY_ART_ROOT "/fnt"
-#define BROKY_ICO_ROOT BROKY_ART_ROOT "/ico"
+#define ART_ROOT        "art"
+#define BROKY_ART_ROOT  ART_ROOT        "/broky"
+#define BROKY_AI_ROOT   BROKY_ART_ROOT  "/ai"
+#define BROKY_FNT_ROOT  BROKY_ART_ROOT  "/fnt"
+#define BROKY_ICO_ROOT  BROKY_ART_ROOT  "/ico"
 
 #include "env.h"
 #include "rayext.h"

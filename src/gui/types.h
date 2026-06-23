@@ -102,6 +102,7 @@ typedef struct {
 typedef enum {
     EGUI_Font_Default,
     EGUI_Font_GUI,
+    EGUI_Font_ShareTech,
     EGUI_Font_Count
 } EGUI_Font;
 

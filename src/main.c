@@ -9,7 +9,31 @@
 #define GAME_RES_HALF_W     160
 #define GAME_RES_HALF_H     120
 
+static void InitArtWorkingDirectory(void)
+{
+    if (DirectoryExists(ART_ROOT)) return;
+
+    const char *app_dir = GetApplicationDirectory();
+
+    if (DirectoryExists(TextFormat("%s/%s", app_dir, ART_ROOT))) {
+        ChangeDirectory(app_dir);
+        return;
+    }
+
+    if (DirectoryExists(TextFormat("%s/../%s", app_dir, ART_ROOT))) {
+        ChangeDirectory(TextFormat("%s/..", app_dir));
+        return;
+    }
+
+    if (DirectoryExists(TextFormat("%s/../../%s", app_dir, ART_ROOT))) {
+        ChangeDirectory(TextFormat("%s/../..", app_dir));
+        return;
+    }
+}
+
 int main(void) {
+    InitArtWorkingDirectory();
+
     if (DEV_FULLSCREEN == false)
         SetConfigFlags(FLAG_WINDOW_RESIZABLE);
 

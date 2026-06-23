@@ -100,7 +100,7 @@ GUI_CursorSetup* GUI_GetCursorSetup()
 // > FONTS
 GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
 {
-    _Static_assert(EGUI_Font_Count == 2,  "Update fonts here");
+    _Static_assert(EGUI_Font_Count == 3,  "Update fonts here");
 
     switch (font) {
     case EGUI_Font_GUI: {
@@ -117,6 +117,22 @@ GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
             .blink_alpha    = 0.95f
         };
         SetTextureFilter(result.custom.texture, TEXTURE_FILTER_POINT);
+        return result;
+    }
+    case EGUI_Font_ShareTech: {
+        GUI_FontSetup result = {
+            .default_height = 36,
+            .border         = 2.0f,
+            .scale          = 1.0f,
+            .delta          = (Vector2){ 6.0f, 6.0f },
+            .custom         = LoadFontEx(BROKY_FNT_ROOT "/ShareTech-Regular.ttf", 26, 0, 0),
+            .use_custom     = true,
+            .spacing        = 1.0f,
+            .blink_size     = (Vector2){ 1.0f, 30.0f },
+            .blink_delta    = (Vector2){ 0.0f, 0.0f },
+            .blink_alpha    = 0.95f
+        };
+        //SetTextureFilter(result.custom.texture, TEXTURE_FILTER_POINT);
         return result;
     }
     case EGUI_Font_Default:

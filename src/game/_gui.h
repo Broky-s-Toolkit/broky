@@ -14,6 +14,7 @@ void WIN_Window(GUI_Window* window);
 void WIN_Layouts(GUI_Window* window);
 void WIN_CharacterDebug(GUI_Window* window);
 void WIN_Settings(GUI_Window* window);
+void WIN_Logo(GUI_Window* window);
 void WIN_Winman(GUI_Window* window);
 
 //
@@ -66,6 +67,19 @@ void GUI_TopBar()
 // SAMPLE WINDOW
 //
 
+const char *GAME_GetFontLabel(EGUI_Font font)
+{
+    switch (font) {
+    case EGUI_Font_GUI:
+        return "GUI";
+    case EGUI_Font_ShareTech:
+        return "ShareTech";
+    case EGUI_Font_Default:
+    default:
+        return "Default";
+    }
+}
+
 // Define your draw window
 void WIN_Window(GUI_Window* window)
 {
@@ -79,7 +93,7 @@ void WIN_Window(GUI_Window* window)
     // Keep or modify colors
     EGUI_ThemeColor colors      = window->colors;
     // Set your font
-    EGUI_Font font     = win_state->font_toggle ? EGUI_Font_GUI: EGUI_Font_Default;
+    EGUI_Font font     = win_state->demo_font;
 
     GUI_SetFont(font);
     // A default layout with 3 columns
@@ -103,17 +117,6 @@ void WIN_Window(GUI_Window* window)
     GUI_GridForDuplicate();
     GUI_Text(GUI_GridNextX(), "Float", colors);
     GUI_Input(GUI_GridNextXn(2), win_state->input_float_contents, (int)sizeof(win_state->input_float_contents), EGUI_Input_Float, colors);
-
-    // Wallpaper check (checkbox/switch)
-    // With a theme.red color
-    GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "Wallpaper",  colors);
-    GUI_Check(GUI_GridNextXn(2), &win_state->checkbox_value, "ON", "OFF", EGUI_ThemeColor_Red);
-
-    // Font toggler
-    GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "Font",  colors);
-    GUI_Check(GUI_GridNextXn(2), &win_state->font_toggle, "GUI", "DEF", colors);
 }
 
 void WIN_Layouts(GUI_Window* window)
@@ -214,10 +217,12 @@ void WIN_CharacterDebug(GUI_Window* window)
 // Define your draw window
 void WIN_Settings(GUI_Window* window)
 {
+    GAME_WindowState *win_state = GAME_CTX.win_state;
     GUI_State *state            = GUI_GetState();
     EGUI_ThemeColor colors      = window->colors;
-    EGUI_Font font     = EGUI_Font_Default;
+    EGUI_Font font             = win_state->demo_font;
 
+    GUI_SetFont(font);
     GUI_GridForCols(3, font);
     GUI_Text(GUI_GridNextX(), "Scale", colors);
     GUI_Float(GUI_GridNextXn(2), &state->scale, colors, 0.5f, 6.0f);
@@ -225,6 +230,33 @@ void WIN_Settings(GUI_Window* window)
     GUI_GridForDuplicate();
     GUI_Text(GUI_GridNextX(), "Scale 2", colors);
     GUI_Float(GUI_GridNextXn(2), &state->scale, colors, 0.5f, 6.0f);
+
+    GUI_GridForDuplicate();
+    GUI_Text(GUI_GridNextX(), "Wallpaper", colors);
+    GUI_Check(GUI_GridNextXn(2), &win_state->checkbox_value, "ON", "OFF", EGUI_ThemeColor_Red);
+
+    GUI_GridForDuplicate();
+    GUI_Text(GUI_GridNextX(), "Font", colors);
+    if (GUI_Button(GUI_GridNextXn(2), GAME_GetFontLabel(win_state->demo_font), NULL, colors)) {
+        win_state->demo_font = (EGUI_Font)((win_state->demo_font + 1) % EGUI_Font_Count);
+    }
+}
+
+void WIN_Logo(GUI_Window* window)
+{
+    static Texture2D logo = {0};
+    if (logo.id == 0) logo = LoadTexture(BROKY_AI_ROOT "/logo.png");
+
+    EGUI_Font font          = GUI_GetFont();
+    float default_height    = GUI_CalcDefaultHeightScaled(font);
+    Rectangle workspace     = window->workspace;
+
+    // Label
+    GUI_GridForXY(workspace.width, default_height, 0);
+    GUI_Text(GUI_GridNextY(), "Broky logo", window->colors);
+    // Image
+    Rectangle next = GUI_GridNextY();
+    GUI_Image(logo, (Rectangle){ next.x, next.y, next.width, 320 });
 }
 
 void WIN_Winman(GUI_Window* window)
@@ -267,6 +299,16 @@ void WIN_Winman(GUI_Window* window)
         int win_id = 5;
         if (win_settings == NULL || win_settings->id == 0) {
             win_settings = GUI_OpenWindow(win_id, "Settings", EGUI_ThemeColor_Gray, &icons->Face, true, WIN_Settings);
+        }
+        GUI_ForceZindex(win_id);
+    }
+    static GUI_Window* win_logo = NULL;
+    if (GUI_Button(GUI_GridNextY(), "Logo window", &icons->Dog, window->colors)) {
+        int win_id = 6;
+        if (win_logo == NULL || win_logo->id == 0) {
+            win_logo = GUI_OpenWindow(win_id, "Logo", EGUI_ThemeColor_Abstractica, &icons->Dog, false, WIN_Logo);
+            win_logo->shape.width = 520.0f;
+            win_logo->shape.height = 420.0f;
         }
         GUI_ForceZindex(win_id);
     }
