@@ -1,0 +1,71 @@
+{
+  "configurations": [
+    {
+      "name": "Debug linux",
+      "type": "gdb",
+      "request": "launch",
+      "target": "${workspaceRoot}/bin/dbg-linux/run",
+      "cwd": "${workspaceRoot}/root/",
+      "valuesFormatting": "parseText",
+      "env": {
+        "LD_LIBRARY_PATH": "/usr/local/lib64/:${env:LD_LIBRARY_PATH}"
+      }
+    },
+    {
+      "name": "Debug mac",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceRoot}/bin/dbg-mac/run",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceRoot}/root/",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "lldb"
+    },
+    {
+      "name": "Debug windows",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/dbg-win/run.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceRoot}/root/",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "C:\\msys64\\ucrt64\\bin\\gdb.exe",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        },
+        {
+          "description": "Set Disassembly Flavor to Intel",
+          "text": "-gdb-set disassembly-flavor intel",
+          "ignoreFailures": true
+        }
+      ]
+    },
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "cppdbg",
+      "request": "launch",
+      "args": [],
+      "stopAtEntry": false,
+      "externalConsole": false,
+      "cwd": "${workspaceRoot}/root/",
+      "program": "${workspaceFolder}/bin/dbg-linux/run",
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}
