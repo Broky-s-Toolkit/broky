@@ -243,7 +243,7 @@ int main(void) {
                     float parallax = 1.4f;
 
                     static Texture2D arbol = {0};
-                    if (arbol.id == 0) arbol = LoadTexture("art/arbol.png");
+                    if (arbol.id == 0) arbol = LoadTexture(BROKY_ART_ROOT "/arbol.png");
 
                     // Configuración
                     int num_arboles = 10;         // cuantos arboles
@@ -280,7 +280,7 @@ int main(void) {
                 }
 
                 static Texture2D casaena = {0};
-                if (casaena.id == 0) casaena = LoadTexture("art/casaena.png");
+                if (casaena.id == 0) casaena = LoadTexture(BROKY_ART_ROOT "/casaena.png");
                 DrawTextureEx(casaena, (Vector2){ 10 * scale_x, -100 * scale_y }, 0, scale_x, WHITE);*/
             EndMode2D();
 

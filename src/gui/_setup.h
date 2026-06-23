@@ -49,7 +49,7 @@ GUI_CursorSetup GUI_LoadCursorSetupForType(EGUI_Cursor cursor)
     switch (cursor)
     {
         case EGUI_Cursor_AGS:
-            setup.texture                   = LoadTexture("ico/cursor.png");
+            setup.texture                   = LoadTexture(BROKY_ICO_ROOT "/cursor.png");
             setup.delta_normalized          = (Vector2){ 0.5f, 0.5f };
             setup.scale                     = 2.0f;
             setup.alpha                     = 1.0f;
@@ -58,7 +58,7 @@ GUI_CursorSetup GUI_LoadCursorSetupForType(EGUI_Cursor cursor)
             break;
 
         case EGUI_Cursor_Text:
-            setup.texture                   = LoadTexture("ico/pointer_txt.png");
+            setup.texture                   = LoadTexture(BROKY_ICO_ROOT "/pointer_txt.png");
             setup.delta_normalized          = (Vector2){ -1.0f, 0.0f };
             setup.scale                     = 2.0f;
             setup.alpha                     = 0.85f;
@@ -67,7 +67,7 @@ GUI_CursorSetup GUI_LoadCursorSetupForType(EGUI_Cursor cursor)
             break;
 
         case EGUI_Cursor_Resize:
-            setup.texture                   = LoadTexture("ico/pointer_resize.png");
+            setup.texture                   = LoadTexture(BROKY_ICO_ROOT "/pointer_resize.png");
             setup.delta_normalized          = (Vector2){ 0.0f, 0.0f };
             setup.scale                     = 2.0f;
             setup.alpha                     = 1.0f;
@@ -77,7 +77,7 @@ GUI_CursorSetup GUI_LoadCursorSetupForType(EGUI_Cursor cursor)
 
         case EGUI_Cursor_Default:
         default:
-            setup.texture                   = LoadTexture("ico/pointer.png");
+            setup.texture                   = LoadTexture(BROKY_ICO_ROOT "/pointer.png");
             setup.delta_normalized          = (Vector2){ 0.0f, 0.0f };
             setup.scale                     = 2.0f;
             setup.alpha                     = 1.0f;
@@ -126,7 +126,7 @@ GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
             .border         = 2.0f,
             .scale          = 1.0f,
             .delta          = (Vector2){ 6.0f, 6.0f },
-            .custom         = LoadFontEx("fnt/unifont-17.0.01.otf", 16, 0, 0),
+            .custom         = LoadFontEx(BROKY_FNT_ROOT "/unifont-17.0.01.otf", 16, 0, 0),
             .use_custom     = true,
             .spacing        = 1.0f,
             .blink_size     = (Vector2){ 1.0f, 30.0f },
@@ -279,17 +279,17 @@ GUI_Icons GUI_LoadIcons()
 {
     GUI_Icons icons = {
         .None           = (Texture2D){0},
-        .New            = LoadTexture("ico/new.png"),
-        .Open           = LoadTexture("ico/open.png"),
-        .Save           = LoadTexture("ico/save.png"),
-        .Setup          = LoadTexture("ico/setup.png"),
-        .Error          = LoadTexture("ico/error.png"),
-        .Face           = LoadTexture("ico/face.png"),
-        .Dog            = LoadTexture("ico/dog.png"),
-        .Close          = LoadTexture("ico/close.png"),
-        .CloseSmall     = LoadTexture("ico/close-sm.png"),
-        .MinimizeSmall  = LoadTexture("ico/minimize-sm.png"),
-        .Layouts        = LoadTexture("ico/layouts.png"),
+        .New            = LoadTexture(BROKY_ICO_ROOT "/new.png"),
+        .Open           = LoadTexture(BROKY_ICO_ROOT "/open.png"),
+        .Save           = LoadTexture(BROKY_ICO_ROOT "/save.png"),
+        .Setup          = LoadTexture(BROKY_ICO_ROOT "/setup.png"),
+        .Error          = LoadTexture(BROKY_ICO_ROOT "/error.png"),
+        .Face           = LoadTexture(BROKY_ICO_ROOT "/face.png"),
+        .Dog            = LoadTexture(BROKY_ICO_ROOT "/dog.png"),
+        .Close          = LoadTexture(BROKY_ICO_ROOT "/close.png"),
+        .CloseSmall     = LoadTexture(BROKY_ICO_ROOT "/close-sm.png"),
+        .MinimizeSmall  = LoadTexture(BROKY_ICO_ROOT "/minimize-sm.png"),
+        .Layouts        = LoadTexture(BROKY_ICO_ROOT "/layouts.png"),
     };
     return icons;
 }

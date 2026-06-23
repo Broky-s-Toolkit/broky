@@ -314,7 +314,7 @@ void WIN_Winman(GUI_Window* window)
     GUI_GridNextY(); // Jump line
 
     static Texture2D image;
-    if (image.id == 0) image = LoadTexture("art/abstractica.png");
+    if (image.id == 0) image = LoadTexture(BROKY_AI_ROOT "/abstractica.png");
     next = GUI_GridNextY();
     GUI_Image(image, (Rectangle){ next.x, next.y, next.width, 320 });
 }
