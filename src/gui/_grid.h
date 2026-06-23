@@ -4,7 +4,6 @@
 #include "../common.h"
 #endif
 
-
 // > SUBMODULE: GRID
 //   1. Grid has a workspace: GUI_GridReset(Rectangle workspace) or  GUI_GridResetForScreen()
 //   2. The workspace is divided: GUI_GridFor(...)
@@ -22,7 +21,7 @@ void            GUI_GridReset(Rectangle workspace);
 void            GUI_GridForX(float w);
 void            GUI_GridForY(float h);
 void            GUI_GridForXY(float w, float h, float h_keep);
-void            GUI_GridForCols(int columns, EGUI_Font font);
+void            GUI_GridForCols(int columns, float default_height);
 void            GUI_GridForDuplicate();
 void            GUI_GridClearWorkspace();
 // > IN PLACE QUERIES
@@ -173,11 +172,10 @@ void GUI_GridForXY(float w, float h, float h_keep)
     }
 }
 
-void GUI_GridForCols(int columns, EGUI_Font font)
+void GUI_GridForCols(int columns, float default_height)
 {
-    float default_height = GUI_CalcDefaultHeightScaled(font);
-    GUI_GridForXY(GUI_CTX.temp->grid.current_workspace.width / (float)columns, default_height, 0);
-    GUI_SetFont(font);
+    float width = GUI_CTX.temp->grid.current_workspace.width;
+    GUI_GridForXY(width / (float)columns, default_height, 0);
 }
 
 void GUI_GridForDuplicate()

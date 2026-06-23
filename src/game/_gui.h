@@ -54,7 +54,8 @@ void GUI_TopBar()
     Vector2 start       = RectPosition(GUI_GridAt(0,0));
     const int BUTTONS   = 4;
     GUI_SetThemeColors(EGUI_ThemeColor_Red);
-    GUI_GridForCols(BUTTONS, EGUI_Font_GUI);
+    GUI_SetFont(EGUI_Font_GUI);
+    GUI_GridForCols(BUTTONS, GUI_CalcDefaultHeightScaled(GUI_GetFont()));
     GUI_ButtonMenu(GUI_GridNextX(), "Project",     &icons->None,  EGUI_ThemeColor_Red,          GUI_ProgramMenu);
     GUI_ButtonMenu(GUI_GridNextX(), "Game",        &icons->Dog,   EGUI_ThemeColor_Abstractica,  GUI_GameMenu);
     GUI_ButtonMenu(GUI_GridNextX(), "Other",       &icons->Dog,   EGUI_ThemeColor_Gray,         GUI_GameMenu);
@@ -97,7 +98,7 @@ void WIN_Window(GUI_Window* window)
 
     GUI_SetFont(font);
     // A default layout with 3 columns
-    GUI_GridForCols(3, font);
+    GUI_GridForCols(3, GUI_CalcDefaultHeightScaled(GUI_GetFont()));
 
     GUI_GridNextX();
     GUI_ButtonMenu(GUI_GridNextX(), "Game 2",    &icons->Dog,    EGUI_ThemeColor_Abstractica, GUI_GameMenu);
@@ -173,9 +174,8 @@ void WIN_CharacterDebug(GUI_Window* window)
     GAME_State *game_state      = GAME_CTX.state;
     GAME_Character *ch          = &game_state->characters[game_state->current_character];
     EGUI_ThemeColor colors      = window->colors;
-    EGUI_Font font     = EGUI_Font_Default;
 
-    GUI_GridForCols(2, font);
+    GUI_GridForCols(2, GUI_CalcDefaultHeightScaled(GUI_GetFont()));
 
     // Shape
     GUI_Text(GUI_GridNextX(), "shape.x", colors);
@@ -223,7 +223,7 @@ void WIN_Settings(GUI_Window* window)
     EGUI_Font font             = win_state->demo_font;
 
     GUI_SetFont(font);
-    GUI_GridForCols(3, font);
+    GUI_GridForCols(3, GUI_CalcDefaultHeightScaled(GUI_GetFont()));
     GUI_Text(GUI_GridNextX(), "Scale", colors);
     GUI_Float(GUI_GridNextXn(2), &state->scale, colors, 0.5f, 6.0f);
 
