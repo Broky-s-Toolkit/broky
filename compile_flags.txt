@@ -1,5 +1,6 @@
 -I/home/dacanizares/source/broky/src
 -I/home/dacanizares/source/broky/lib/gui
 -I/home/dacanizares/source/broky/lib/rayext
+-I/home/dacanizares/source/broky/lib/broky
 -I/usr/local/include
 -std=c99

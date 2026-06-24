@@ -1,9 +1,7 @@
 #pragma once
 #ifndef NON_EDITOR_BUILD
-#define IMPLEMENT_ALL   1
-#include "../common.h"
+#include "gui.h"
 #endif
-
 
 // > SUBMODULE: CONTROLS
 // > INDEX

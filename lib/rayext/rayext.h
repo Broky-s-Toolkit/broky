@@ -1,14 +1,8 @@
 #pragma once
 #ifndef NON_EDITOR_BUILD
 #define NON_EDITOR_BUILD 0
+#include "global.h"
 #endif
-
-#include <stdio.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <raylib.h>
-#include <rlgl.h>
-#include <raymath.h>
 
 #define Assert(cond) \
     do { \
