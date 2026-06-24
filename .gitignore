@@ -17,3 +17,7 @@ vs-project
 .idea/workspace.xml
 .idea/editor.xml
 .idea/misc.xml
+
+cmake-build-debug
+cmake-build-*
+tmp/cmake-build-*
