@@ -1,39 +1,40 @@
 #pragma once
 #ifndef NON_EDITOR_BUILD
-#include "gui.h"
+ #include "gui_base.h"
 #endif
+
 
 // > SUBMODULE: SETUP
 // > INDEX
 
 // > CURSORS
 GUI_CursorSetup     GUI_LoadCursorSetupForType(EGUI_Cursor cursor);
-GUI_CursorSetup*    GUI_GetCursorSetup();
+GUI_CursorSetup*    GUI_GetCursorSetup(void);
 // > FONTS
 GUI_FontSetup       GUI_LoadFontSetupDefault(EGUI_Font font);
 GUI_FontSetup*      GUI_GetFontSetup(EGUI_Font font);
 Font                GUI_GetFontAsset(EGUI_Font font);
-EGUI_Font           GUI_GetFont();
+EGUI_Font           GUI_GetFont(void);
 void                GUI_SetFont(EGUI_Font font);
 // > THEME
 GUI_ThemeColors     GUI_LoadThemeColorsDefault(EGUI_ThemeColor color);
 GUI_ThemeColors     GUI_MakeThemeColors(Color tx_color_0, Color tx_color_1, Color bg_color_0, Color bg_color_1, Color bg_color_2, Color bg_color_3);
 Color               GUI_GenerateThemeColor(float hue, float intensity);
 GUI_ThemeColors     GUI_GenerateThemeColors(float hue);
-GUI_Theme           GUI_GenerateTheme();
-GUI_Theme           GUI_GetTheme();
+GUI_Theme           GUI_GenerateTheme(void);
+GUI_Theme           GUI_GetTheme(void);
 GUI_ThemeColors     GUI_GetThemeColors(EGUI_ThemeColor color);
-EGUI_ThemeColor     GUI_GetThemeColor();
+EGUI_ThemeColor     GUI_GetThemeColor(void);
 void                GUI_SetThemeColors(EGUI_ThemeColor color);
 // > ICONS
-GUI_Icons           GUI_LoadIcons();
+GUI_Icons           GUI_LoadIcons(void);
 GUI_IconSetup       GUI_MakeIconSetup(GUI_Icons icons);
-GUI_Icons*          GUI_GetIcons();
-float               GUI_GetIconWidth();
+GUI_Icons*          GUI_GetIcons(void);
+float               GUI_GetIconWidth(void);
 float               GUI_GetIconWidthForShape(Rectangle shape, float border);
-float               GUI_GetIconSmallWidth();
+float               GUI_GetIconSmallWidth(void);
 // > COMMON
-GUI_Setup           GUI_LoadSetupDefault();
+GUI_Setup           GUI_LoadSetupDefault(void);
 
 // > IMPLEMENTATION
 #ifdef IMPLEMENT_ALL
@@ -88,7 +89,7 @@ GUI_CursorSetup GUI_LoadCursorSetupForType(EGUI_Cursor cursor)
     return setup;
 }
 
-GUI_CursorSetup* GUI_GetCursorSetup()
+GUI_CursorSetup* GUI_GetCursorSetup(void)
 {
     EGUI_Cursor cursor = GUI_CTX.temp->cursor;
     return &GUI_CTX.setup->cursors[cursor];
@@ -166,7 +167,7 @@ Font GUI_GetFontAsset(EGUI_Font font)
     else
         return GetFontDefault();
 }
-EGUI_Font GUI_GetFont()
+EGUI_Font GUI_GetFont(void)
 {
     EGUI_Font font = GUI_CTX.temp->current_font;
     return font;
@@ -254,7 +255,7 @@ GUI_ThemeColors GUI_GenerateThemeColors(float hue)
     return colors;
 }
 
-GUI_Theme GUI_GenerateTheme()
+GUI_Theme GUI_GenerateTheme(void)
 {
     GUI_Theme theme = {
         .bg_alpha       = 1.0f,
@@ -267,7 +268,7 @@ GUI_Theme GUI_GenerateTheme()
 
     return theme;
 }
-GUI_Theme GUI_GetTheme()
+GUI_Theme GUI_GetTheme(void)
 {
     return GUI_CTX.setup->theme;
 }
@@ -277,7 +278,7 @@ GUI_ThemeColors GUI_GetThemeColors(EGUI_ThemeColor color)
     return GUI_CTX.setup->theme.colors[color];
 }
 
-EGUI_ThemeColor GUI_GetThemeColor()
+EGUI_ThemeColor GUI_GetThemeColor(void)
 {
     return GUI_CTX.temp->current_theme_colors;
 }
@@ -289,7 +290,7 @@ void GUI_SetThemeColors(EGUI_ThemeColor color)
 // < THEME
 
 // > ICONS
-GUI_Icons GUI_LoadIcons()
+GUI_Icons GUI_LoadIcons(void)
 {
     GUI_Icons icons = {
         .None           = (Texture2D){0},
@@ -319,12 +320,12 @@ GUI_IconSetup GUI_MakeIconSetup(GUI_Icons icons)
     return setup;
 }
 
-GUI_Icons* GUI_GetIcons()
+GUI_Icons* GUI_GetIcons(void)
 {
     return &GUI_CTX.setup->icons.icons;
 }
 
-float GUI_GetIconWidth()
+float GUI_GetIconWidth(void)
 {
     return GUI_CTX.setup->icons.icon_size * GUI_CTX.state->scale;
 }
@@ -334,14 +335,14 @@ float GUI_GetIconWidthForShape(Rectangle shape, float border)
     return shape.height - border * 2 * GUI_CTX.state->scale;
 }
 
-float GUI_GetIconSmallWidth()
+float GUI_GetIconSmallWidth(void)
 {
     return GUI_CTX.setup->icons.icon_size_sm * GUI_CTX.state->scale;
 }
 // < ICONS
 
 // > COMMON
-GUI_Setup GUI_LoadSetupDefault()
+GUI_Setup GUI_LoadSetupDefault(void)
 {
     GUI_Setup setup = {
         .theme      = GUI_GenerateTheme(),

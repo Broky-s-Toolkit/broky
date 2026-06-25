@@ -1,7 +1,8 @@
 #pragma once
 #ifndef NON_EDITOR_BUILD
-#include "gui.h"
+ #include "gui.h"
 #endif
+
 
 // > SUBMODULE: GRID
 //   1. Grid has a workspace: GUI_GridReset(Rectangle workspace) or  GUI_GridResetForScreen()
@@ -9,29 +10,29 @@
 //   3. GUI_GridAt(x,y) to get shapes OR GUI_GridNextX() to directly consume the workspace
 // > INDEX
 // > BASICS
-GUI_GridTemp    GUI_MakeGrid();
-float           GUI_GridHeightOrDefault();
-float           GUI_GridWidthOrDefault();
+GUI_GridTemp    GUI_MakeGrid(void);
+float           GUI_GridHeightOrDefault(void);
+float           GUI_GridWidthOrDefault(void);
 Rectangle       GUI_GridRelative(Rectangle shape);
 Rectangle       GUI_GridRelativePositionOnly(Rectangle shape);
 // > GRID STARTERS
-void            GUI_GridResetForScreen();
+void            GUI_GridResetForScreen(void);
 void            GUI_GridReset(Rectangle workspace);
 void            GUI_GridForX(float w);
 void            GUI_GridForY(float h);
 void            GUI_GridForXY(float w, float h, float h_keep);
 void            GUI_GridForCols(int columns, float default_height);
-void            GUI_GridForDuplicate();
-void            GUI_GridClearWorkspace();
+void            GUI_GridForDuplicate(void);
+void            GUI_GridClearWorkspace(void);
 // > IN PLACE QUERIES
 Rectangle       GUI_GridAt(int x, int y);
 Rectangle       GUI_GridBetween(int x, int y, int x_end, int y_end);
 // > CONSUMABLES
-Rectangle       GUI_GridNextX();
-Rectangle       GUI_GridNextY();
+Rectangle       GUI_GridNextX(void);
+Rectangle       GUI_GridNextY(void);
 Rectangle       GUI_GridNextXn(int n);
 Rectangle       GUI_GridNextYn(int n);
-void            GUI_GridAutoJump();
+void            GUI_GridAutoJump(void);
 // > INFO
 Rectangle       GUI_GridAvailable(Rectangle workspace);
 Rectangle       GUI_GridApplyScroll(Rectangle shape);
@@ -40,7 +41,7 @@ Rectangle       GUI_GridApplyScroll(Rectangle shape);
 #ifdef IMPLEMENT_ALL
 
 // > BASICS
-GUI_GridTemp GUI_MakeGrid()
+GUI_GridTemp GUI_MakeGrid(void)
 {
     GUI_GridTemp grid = {
         .current_workspace          = (Rectangle) { 0.f, 0.f, 0.f, 0.f},
@@ -55,13 +56,13 @@ GUI_GridTemp GUI_MakeGrid()
     return grid;
 }
 
-float GUI_GridHeightOrDefault()
+float GUI_GridHeightOrDefault(void)
 {
     float vertical_size = GUI_CTX.temp->grid.vertical_size;
     return vertical_size != 0 ? vertical_size : (float)GetScreenHeight();
 }
 
-float GUI_GridWidthOrDefault()
+float GUI_GridWidthOrDefault(void)
 {
     float horizontal_size = GUI_CTX.temp->grid.horizontal_size;
     return horizontal_size != 0 ? horizontal_size : (float)GetScreenWidth();
@@ -98,7 +99,7 @@ Rectangle GUI_GridRelativePositionOnly(Rectangle shape)
 // < END BASICS
 
 // > GRID STARTERS
-void GUI_GridResetForScreen()
+void GUI_GridResetForScreen(void)
 {
     GUI_GridReset(GetScreenRect());
 }
@@ -177,12 +178,12 @@ void GUI_GridForCols(int columns, float default_height)
     GUI_GridForXY(width / (float)columns, default_height, 0);
 }
 
-void GUI_GridForDuplicate()
+void GUI_GridForDuplicate(void)
 {
     GUI_GridForXY(GUI_CTX.temp->grid.horizontal_size, GUI_CTX.temp->grid.vertical_size, 0);
 }
 
-void GUI_GridClearWorkspace()
+void GUI_GridClearWorkspace(void)
 {
     GUI_CTX.temp->grid.current_workspace = (Rectangle){ 0 };
 }
@@ -220,14 +221,14 @@ Rectangle GUI_GridBetween(int x, int y, int x_end, int y_end)
 // < END IN PLACE QUERIES
 
 // > CONSUMABLES
-Rectangle GUI_GridNextX()
+Rectangle GUI_GridNextX(void)
 {
     Rectangle shape = GUI_GridAt(0, 0);
     GUI_CTX.temp->grid.horizontal_count++;
     return shape;
 }
 
-Rectangle GUI_GridNextY()
+Rectangle GUI_GridNextY(void)
 {
     Rectangle shape         = GUI_GridAt(0, 0);
     float vertical_size     = GUI_CTX.temp->grid.vertical_size;
@@ -277,7 +278,7 @@ Rectangle GUI_GridNextYn(int n)
     return result;
 }
 
-void GUI_GridAutoJump()
+void GUI_GridAutoJump(void)
 {
     bool used_space = GUI_CTX.temp->grid.horizontal_count > 0 && GUI_CTX.temp->grid.vertical_count == 0;
     if (used_space) {

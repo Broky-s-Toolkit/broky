@@ -1,12 +1,12 @@
 #pragma once
 #ifndef NON_EDITOR_BUILD
-#include "gui.h"
+ #include "gui_base.h"
 #endif
 
 
 // > SUBMODULE: WINDOW
 // > INDEX
-Rectangle       GUI_MakeWorkspace();
+Rectangle       GUI_MakeWorkspace(void);
 GUI_Window      GUI_MakeEmptyWindow(void);
 
 // > WINDOW CONTROLS
@@ -14,7 +14,7 @@ GUI_Window      GUI_MakeEmptyWindow(void);
 
 // > WINDOW RUNTIME
 
-void            GUI_CleanAndPrepareZIndex();
+void            GUI_CleanAndPrepareZIndex(void);
 void            GUI_UpdateAndDrawWindows(Rectangle limits);
 // > WINDOW STATE
 GUI_Window*     GUI_OpenWindow(
@@ -35,7 +35,7 @@ void            GUI_WindowUpdateShapeForContent(GUI_Window *window);
 #ifdef IMPLEMENT_ALL
 
 // > CONSTRUCTORS
-Rectangle GUI_MakeWorkspace()
+Rectangle GUI_MakeWorkspace(void)
 {
     Rectangle workspace = {
         0, 0, (float)GetScreenWidth(), (float)GetScreenHeight()
@@ -62,7 +62,7 @@ GUI_Window GUI_MakeEmptyWindow(void)
 // < END CONSTRUCTORS
 
 // > WINDOW RUNTIME
-void GUI_CleanAndPrepareZIndex()
+void GUI_CleanAndPrepareZIndex(void)
 {
     GUI_State* state = GUI_CTX.state;
 

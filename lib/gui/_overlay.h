@@ -1,27 +1,27 @@
 #pragma once
 #ifndef NON_EDITOR_BUILD
-#include "gui.h"
+ #include "gui_base.h"
 #endif
 
 
 // > SUBMODULE: OVERLAY
 // > INDEX
-GUI_Overlay     GUI_MakeOverlay();
-void            GUI_DrawOverlay();
+GUI_Overlay     GUI_MakeOverlay(void);
+void            GUI_DrawOverlay(void);
 bool            GUI_OverlayOpenedBy(const char* text_id_owner);
-bool            GUI_OverlayWasJustEnabled();
-EGUI_ThemeColor GUI_OverlayColors();
-void            GUI_OverlayClose();
+bool            GUI_OverlayWasJustEnabled(void);
+EGUI_ThemeColor GUI_OverlayColors(void);
+void            GUI_OverlayClose(void);
 void            GUI_OverlayOpenFor(const char* id);
 void            GUI_OverlaySetDrawCall(bool just_enabled, EGUI_ThemeColor colors, void (*draw_function)(void));
 void            GUI_OverlaySetFinalShape(Rectangle shape);
-bool            GUI_OverlayIsDrawing();
+bool            GUI_OverlayIsDrawing(void);
 void            GUI_BeginOverlay(bool force_overflow, bool restore_grid);
 void            GUI_EndOverlay(Rectangle final_shape);
 
 // > IMPLEMENTATION
 #ifdef IMPLEMENT_ALL
-GUI_Overlay GUI_MakeOverlay()
+GUI_Overlay GUI_MakeOverlay(void)
 {
     GUI_Overlay overlay = {
         .id_ptr             = NULL,
@@ -35,7 +35,7 @@ GUI_Overlay GUI_MakeOverlay()
     return overlay;
 }
 
-void GUI_DrawOverlay()
+void GUI_DrawOverlay(void)
 {
     GUI_Overlay *overlay    = &GUI_CTX.temp->overlay;
     bool is_enabled         = overlay->function != NULL && overlay->id_ptr != NULL;
@@ -56,17 +56,17 @@ bool GUI_OverlayOpenedBy(const char* text_id_owner)
     return GUI_CTX.temp->overlay.id_ptr == text_id_owner;
 }
 
-bool GUI_OverlayWasJustEnabled()
+bool GUI_OverlayWasJustEnabled(void)
 {
     return GUI_CTX.temp->overlay.just_enabled;
 }
 
-EGUI_ThemeColor GUI_OverlayColors()
+EGUI_ThemeColor GUI_OverlayColors(void)
 {
     return GUI_CTX.temp->overlay.colors;
 }
 
-void GUI_OverlayClose()
+void GUI_OverlayClose(void)
 {
     GUI_CTX.temp->overlay = GUI_MakeOverlay();
 }
@@ -99,7 +99,7 @@ void GUI_OverlaySetFinalShape(Rectangle shape)
     GUI_CTX.temp->overlay.final_shape = final_shape;
 }
 
-bool GUI_OverlayIsDrawing()
+bool GUI_OverlayIsDrawing(void)
 {
     return GUI_CTX.temp->overlay.is_drawing;
 }

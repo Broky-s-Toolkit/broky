@@ -1,6 +1,7 @@
 #pragma once
 #ifndef NON_EDITOR_BUILD
-#include "gui.h"
+ #include "gui_base.h"
+ #include "_overlay.h"
 #endif
 
 // > SUBMODULE: CONTROLS
@@ -13,7 +14,7 @@
 bool        GUI_CheckCollisionCursorControl(Rectangle shape, GUI_Window *window);
 bool        GUI_CheckCollisionCursorControlWin(Rectangle shape);
 Rectangle   GUI_ControlShapeCut(Rectangle shape, float border, float scale, bool intersect_window);
-void        GUI_BeginControlScissor();
+void        GUI_BeginControlScissor(void);
 void        GUI_BeginInnerControlScissor(Rectangle shape, float border, float scale);
 // > DRAW PRIMITIVES
 void        GUI_DrawBorders(Rectangle shape, Color dark, Color light, float border, bool remove_corner);
@@ -21,8 +22,8 @@ void        GUI_DrawAdjustedTextEx(const char* text, Vector2 position, Color tin
 Vector2     GUI_MeasureAdjustedText(const char* text, EGUI_Font font);
 // > CURSOR
 void        GUI_DrawCursorFor(EGUI_Cursor cursor);
-void        GUI_DrawCursor();
-void        GUI_DrawCursorTrail();
+void        GUI_DrawCursor(void);
+void        GUI_DrawCursorTrail(void);
 // > ICONS
 float       GUI_DrawIcon(Rectangle shape, Texture2D* texture2d, Color tint);
 float       GUI_Icon(Texture2D* texture2d, Vector2 position, float height, Color tint);
@@ -161,7 +162,7 @@ Rectangle GUI_ControlShapeCut(Rectangle shape, float border, float scale, bool i
     return result;
 }
 
-void GUI_BeginControlScissor()
+void GUI_BeginControlScissor(void)
 {
     bool not_overflow   = GUI_CTX.temp->grid.force_overflow == false;
     int window_id       = GUI_CTX.temp->window_current_id;
@@ -266,7 +267,7 @@ void GUI_DrawCursorFor(EGUI_Cursor cursor)
     DrawTextureEx(texture, mouse_shape, 0, scale, ColorAlpha(WHITE, setup->alpha));
 }
 
-void GUI_DrawCursor()
+void GUI_DrawCursor(void)
 {
     EGUI_Cursor cursor              = GUI_CTX.temp->cursor;
     GUI_CursorSetup* cursor_setup   = &GUI_CTX.setup->cursors[cursor];
@@ -277,7 +278,7 @@ void GUI_DrawCursor()
 }
 
 // raylib [shapes] example - Draw a mouse trail (position history)
-void GUI_DrawCursorTrail()
+void GUI_DrawCursorTrail(void)
 {
     GUI_CursorSetup *setup          = GUI_GetCursorSetup();
     Vector2 mouse                   = GUI_CTX.temp->cursor_current;
