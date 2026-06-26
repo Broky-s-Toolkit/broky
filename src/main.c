@@ -10,6 +10,7 @@
 #define GAME_RES_HALF_W     160
 #define GAME_RES_HALF_H     120
 
+
 int main(void) {
     InitArtWorkingDirectory();
 
@@ -63,6 +64,7 @@ int main(void) {
     SetTextureFilter(game_canvas.texture, TEXTURE_FILTER_POINT);
 
     SetTargetFPS(60);
+    WaitForWindowSizeStable(2, 256);
     while (!WindowShouldClose()) {
         // RESET TEMP VALUES ONLY 1-FRAME
         GAME_CTX.temp->player_actions   = GAME_MakeActions();

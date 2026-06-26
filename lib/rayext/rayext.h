@@ -30,6 +30,31 @@ const char* BuildTimeFormatted()
     return buffer;
 }
 
+static Vector2 WaitForWindowSizeStable(int stable_frames, int max_frames)
+{
+    Assert(stable_frames > 0 && max_frames > stable_frames);
+    int last_w = GetScreenWidth();
+    int last_h = GetScreenHeight();
+    int stable = 0;
+
+    for (int i = 0; i < max_frames && stable < stable_frames && !WindowShouldClose(); ++i) {
+        int current_w = GetScreenWidth();
+        int current_h = GetScreenHeight();
+        bool same_size = current_w == last_w && current_h == last_h;
+        bool valid_size = current_w > 0 && current_h > 0;
+
+        stable = (same_size && valid_size) ? (stable + 1) : 0;
+        last_w = current_w;
+        last_h = current_h;
+
+        BeginDrawing();
+        ClearBackground(BLACK);
+        EndDrawing();
+    }
+
+    return (Vector2){ (float)last_w, (float)last_h };
+}
+
 static void InitArtWorkingDirectory(void)
 {
     if (DirectoryExists(ART_ROOT)) return;
