@@ -1,6 +1,7 @@
 #pragma once
 #ifndef NON_EDITOR_BUILD
  #include "gui_base.h"
+ #include "_setup.h"
 #endif
 
 

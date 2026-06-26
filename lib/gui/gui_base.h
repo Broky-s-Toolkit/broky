@@ -278,3 +278,4 @@ bool            GUI_IsCursorOverOverlay(void);
 void            GUI_BeginDraw(EGUI_Cursor cursor_style);
 void            GUI_ResetStyleDefaults(void);
 void            GUI_EndDraw(void);
+

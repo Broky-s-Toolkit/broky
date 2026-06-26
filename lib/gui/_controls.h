@@ -1,7 +1,9 @@
 #pragma once
 #ifndef NON_EDITOR_BUILD
  #include "gui_base.h"
+ #include "_setup.h"
  #include "_overlay.h"
+ #include "_window.h"
 #endif
 
 // > SUBMODULE: CONTROLS
