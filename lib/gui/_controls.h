@@ -1,5 +1,5 @@
 #pragma once
-#ifndef NON_EDITOR_BUILD
+#ifndef IDE_SYNTAX_HL
  #include "gui_base.h"
  #include "_setup.h"
  #include "_overlay.h"

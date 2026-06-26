@@ -1,5 +1,5 @@
 #pragma once
-#ifndef NON_EDITOR_BUILD
+#ifndef IDE_SYNTAX_HL
 #define IMPLEMENT_ALL   1
 #include "../common.h"
 #endif

@@ -1,6 +1,6 @@
 #pragma once
-#ifndef NON_EDITOR_BUILD
- #define NON_EDITOR_BUILD 0
+#ifndef IDE_SYNTAX_HL
+ #define IDE_SYNTAX_HL 1
  #define IMPLEMENT_ALL
  #include "global.h"
 #endif

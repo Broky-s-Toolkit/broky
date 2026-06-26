@@ -1,7 +1,7 @@
 #pragma once
-#ifndef NON_EDITOR_BUILD
-#define NON_EDITOR_BUILD 0
-#include "global.h"
+#ifndef IDE_SYNTAX_HL
+ #define IDE_SYNTAX_HL 1
+ #include "global.h"
 #endif
 
 #define Assert(cond) \
@@ -28,6 +28,28 @@ const char* BuildTimeFormatted()
 
     snprintf(buffer, sizeof(buffer), "%02dh:%02dm:%02ds %s", h, m, s, ampm);
     return buffer;
+}
+
+static void InitArtWorkingDirectory(void)
+{
+    if (DirectoryExists(ART_ROOT)) return;
+
+    const char *app_dir = GetApplicationDirectory();
+
+    if (DirectoryExists(TextFormat("%s/%s", app_dir, ART_ROOT))) {
+        ChangeDirectory(app_dir);
+        return;
+    }
+
+    if (DirectoryExists(TextFormat("%s/../%s", app_dir, ART_ROOT))) {
+        ChangeDirectory(TextFormat("%s/..", app_dir));
+        return;
+    }
+
+    if (DirectoryExists(TextFormat("%s/../../%s", app_dir, ART_ROOT))) {
+        ChangeDirectory(TextFormat("%s/../..", app_dir));
+        return;
+    }
 }
 
 static bool ParseFloatStrict(const char *s, float *out)
