@@ -110,12 +110,13 @@ GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
             .delta          = (Vector2){ 6.0f, 6.0f },
             .custom         = { 0 },
             .use_custom     = false,
+            .use_atlas      = false,
+            .atlas          = { 0 },
             .spacing        = 1.0f,
             .blink_size     = (Vector2){ 1.0f, 30.0f },
             .blink_delta    = (Vector2){ 0.0f, 0.0f },
             .blink_alpha    = 0.95f
         };
-        SetTextureFilter(result.custom.texture, TEXTURE_FILTER_POINT);
         return result;
     }
     case EGUI_Font_ShareTech: {
@@ -124,14 +125,16 @@ GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
             .border         = 2.0f,
             .scale          = 1.0f,
             .delta          = (Vector2){ 6.0f, 6.0f },
-            .custom         = LoadFontEx(BROKY_FNT_ROOT "/ShareTech-Regular.ttf", 26, 0, 0),
-            .use_custom     = true,
+            .custom         = { 0 },
+            .use_custom     = false,
+            .use_atlas      = true,
+            .atlas          = { 0 },
             .spacing        = 1.0f,
             .blink_size     = (Vector2){ 1.0f, 30.0f },
             .blink_delta    = (Vector2){ 0.0f, 0.0f },
             .blink_alpha    = 0.95f
         };
-        //SetTextureFilter(result.custom.texture, TEXTURE_FILTER_POINT);
+        result.atlas = GUI_LoadFontAtlasASCII(BROKY_FNT_ROOT "/ShareTech-Regular.ttf", 26);
         return result;
     }
     case EGUI_Font_Default:
@@ -143,6 +146,8 @@ GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
             .delta          = (Vector2){ 6.0f, 6.0f },
             .custom         = LoadFontEx(BROKY_FNT_ROOT "/unifont-17.0.01.otf", 16, 0, 0),
             .use_custom     = true,
+            .use_atlas      = false,
+            .atlas          = { 0 },
             .spacing        = 1.0f,
             .blink_size     = (Vector2){ 1.0f, 30.0f },
             .blink_delta    = (Vector2){ 0.0f, 0.0f },

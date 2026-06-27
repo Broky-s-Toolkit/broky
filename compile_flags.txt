@@ -3,4 +3,12 @@
 -I/home/dacanizares/source/broky/lib/rayext
 -I/home/dacanizares/source/broky/lib/broky
 -I/usr/local/include
+-I/usr/include/freetype2
+-I/usr/include/libpng16
+-I/usr/include/harfbuzz
+-I/usr/include/glib-2.0
+-I/usr/lib64/glib-2.0/include
+-I/usr/include/sysprof-6
+-DWITH_GZFILEOP
+-pthread
 -std=c99

@@ -109,6 +109,29 @@ typedef enum {
 } EGUI_Font;
 
 typedef struct {
+    Rectangle   src;
+    int         advance;
+    int         bearing_x;
+    int         bearing_y;
+    int         width;
+    int         height;
+} GUI_FontGlyph;
+
+#define GUI_FONT_ATLAS_GLYPHS 128
+
+typedef struct {
+    bool            ready;
+    Texture2D       texture;
+    int             pixel_size;
+    int             atlas_width;
+    int             atlas_height;
+    int             line_height;
+    int             ascent;
+    int             descent;
+    GUI_FontGlyph   glyphs[GUI_FONT_ATLAS_GLYPHS];
+} GUI_FontAtlas;
+
+typedef struct {
     float           default_height;
     float           border;
 
@@ -116,6 +139,8 @@ typedef struct {
     Vector2         delta;             // Delta adjustment
     Font            custom;
     bool            use_custom;        // Indicates if a custom font is used
+    bool            use_atlas;
+    GUI_FontAtlas   atlas;
     float           spacing;
     Vector2         blink_size;        // Size of the blinking cursor
     Vector2         blink_delta;      // Blink adjustment
@@ -278,4 +303,3 @@ bool            GUI_IsCursorOverOverlay(void);
 void            GUI_BeginDraw(EGUI_Cursor cursor_style);
 void            GUI_ResetStyleDefaults(void);
 void            GUI_EndDraw(void);
-

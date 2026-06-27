@@ -18,6 +18,7 @@ add_executable(broky
     src/game/_gui.h
     lib/broky/global.h
     lib/gui/gui.h
+    lib/gui/_font_ft.h
     lib/gui/_setup.h
     lib/gui/_grid.h
     lib/gui/_window.h
@@ -47,6 +48,7 @@ find_library(RAYLIB_LIB raylib PATHS /usr/local/lib)
 find_package(PkgConfig QUIET)
 
 if(PkgConfig_FOUND)
+    pkg_check_modules(FREETYPE QUIET freetype2)
     pkg_check_modules(FFMPEG QUIET
         libavcodec
         libavformat
@@ -54,6 +56,13 @@ if(PkgConfig_FOUND)
         libswresample
         libswscale
     )
+endif()
+
+if(FREETYPE_FOUND)
+    target_include_directories(broky PRIVATE ${FREETYPE_INCLUDE_DIRS})
+    target_link_directories(broky PRIVATE ${FREETYPE_LIBRARY_DIRS})
+    target_link_libraries(broky PRIVATE ${FREETYPE_LIBRARIES})
+    target_compile_options(broky PRIVATE ${FREETYPE_CFLAGS_OTHER})
 endif()
 
 if(RAYLIB_LIB)
