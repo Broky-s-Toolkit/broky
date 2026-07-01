@@ -134,7 +134,7 @@ GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
             .blink_delta    = (Vector2){ 0.0f, 0.0f },
             .blink_alpha    = 0.95f
         };
-        result.atlas = GUI_LoadFontAtlasASCII(BROKY_FNT_ROOT "/ShareTech-Regular.ttf", 26);
+        result.atlas = GUI_LoadFontAtlasASCII(BROKY_FNT_ROOT "/ShareTech-Regular.ttf", 32);
         return result;
     }
     case EGUI_Font_Default:

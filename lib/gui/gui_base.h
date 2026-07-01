@@ -110,11 +110,11 @@ typedef enum {
 
 typedef struct {
     Rectangle   src;
-    int         advance;
-    int         bearing_x;
-    int         bearing_y;
-    int         width;
-    int         height;
+    float       advance;
+    float       bearing_x;
+    float       bearing_y;
+    float       bearing_x2;
+    float       bearing_y2;
 } GUI_FontGlyph;
 
 #define GUI_FONT_ATLAS_GLYPHS 128

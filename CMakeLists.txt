@@ -31,6 +31,7 @@ target_include_directories(broky PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src/game
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/broky
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/3rd
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/gui
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/rayext
     /usr/local/include
@@ -48,7 +49,6 @@ find_library(RAYLIB_LIB raylib PATHS /usr/local/lib)
 find_package(PkgConfig QUIET)
 
 if(PkgConfig_FOUND)
-    pkg_check_modules(FREETYPE QUIET freetype2)
     pkg_check_modules(FFMPEG QUIET
         libavcodec
         libavformat
@@ -56,13 +56,6 @@ if(PkgConfig_FOUND)
         libswresample
         libswscale
     )
-endif()
-
-if(FREETYPE_FOUND)
-    target_include_directories(broky PRIVATE ${FREETYPE_INCLUDE_DIRS})
-    target_link_directories(broky PRIVATE ${FREETYPE_LIBRARY_DIRS})
-    target_link_libraries(broky PRIVATE ${FREETYPE_LIBRARIES})
-    target_compile_options(broky PRIVATE ${FREETYPE_CFLAGS_OTHER})
 endif()
 
 if(RAYLIB_LIB)
