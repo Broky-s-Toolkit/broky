@@ -18,7 +18,7 @@ add_executable(broky
     src/game/_gui.h
     lib/broky/global.h
     lib/gui/gui.h
-    lib/gui/_font_ft.h
+    lib/gui/_font.h
     lib/gui/_setup.h
     lib/gui/_grid.h
     lib/gui/_window.h

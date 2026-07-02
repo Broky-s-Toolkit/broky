@@ -7,7 +7,7 @@
 #endif
 
 #include "gui_base.h"
-#include "_font_ft.h"
+#include "_font.h"
 #include "_setup.h"
 
 // > SUBMODULES
