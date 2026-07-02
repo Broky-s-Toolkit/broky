@@ -58,8 +58,6 @@ void GUI_FontSettingsMenu()
 
     GUI_BeginOverlay(true, true);
         GUI_SetFont(EGUI_Font_Default);
-        GUI_Button(GUI_GridBetween(-2, 0, -1, 0), "Select font", NULL, colors);
-
         Rectangle menu_0        = GUI_GridBetween(-2, 1, -1, 1);
         Rectangle menu_1        = GUI_GridBetween(-2, 2, -1, 2);
         Rectangle menu_2        = GUI_GridBetween(-2, 3, -1, 3);
