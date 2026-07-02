@@ -14,6 +14,7 @@ void WIN_Window(GUI_Window* window);
 void WIN_Layouts(GUI_Window* window);
 void WIN_CharacterDebug(GUI_Window* window);
 void WIN_Settings(GUI_Window* window);
+void WIN_FontSettings(GUI_Window* window);
 void WIN_Logo(GUI_Window* window);
 void WIN_Winman(GUI_Window* window);
 
@@ -106,18 +107,18 @@ void WIN_Window(GUI_Window* window)
     GUI_GridForDuplicate();
     // 1st input (textbox)
     GUI_Text(GUI_GridNextX(), "Text", colors);
-    GUI_Input(GUI_GridNextXn(2), win_state->input_contents, (int)sizeof(win_state->input_contents), EGUI_Input_Text, colors);
+    GUI_Input(GUI_GridNextXn(2), win_state->input_contents, win_state->input_contents, (int)sizeof(win_state->input_contents), EGUI_Input_Text, colors);
 
     // 2nd input for integer
     // TODO@dc: add min, max and parsing
     GUI_GridForDuplicate();
     GUI_Text(GUI_GridNextX(), "Int", colors);
-    GUI_Input(GUI_GridNextXn(2), win_state->input_int_contents, (int)sizeof(win_state->input_int_contents), EGUI_Input_Int, colors);
+    GUI_Input(GUI_GridNextXn(2), win_state->input_int_contents, win_state->input_int_contents, (int)sizeof(win_state->input_int_contents), EGUI_Input_Int, colors);
 
     // 3rd input for float
     GUI_GridForDuplicate();
     GUI_Text(GUI_GridNextX(), "Float", colors);
-    GUI_Input(GUI_GridNextXn(2), win_state->input_float_contents, (int)sizeof(win_state->input_float_contents), EGUI_Input_Float, colors);
+    GUI_Input(GUI_GridNextXn(2), win_state->input_float_contents, win_state->input_float_contents, (int)sizeof(win_state->input_float_contents), EGUI_Input_Float, colors);
 }
 
 void WIN_Layouts(GUI_Window* window)
@@ -242,6 +243,83 @@ void WIN_Settings(GUI_Window* window)
     }
 }
 
+void WIN_FontSettings(GUI_Window* window)
+{
+    GAME_WindowState *win_state = GAME_CTX.win_state;
+    GUI_Setup *setup            = GUI_GetSetup();
+    EGUI_ThemeColor colors      = window->colors;
+    EGUI_Font font_target       = win_state->editor_font;
+    GUI_FontSetup *font_setup   = &setup->fonts[font_target];
+
+    GUI_SetFont(EGUI_Font_Default);
+    GUI_GridForCols(3, GUI_CalcDefaultHeightScaled(GUI_GetFont()));
+
+    GUI_Text(GUI_GridNextX(), "Editing", colors);
+    if (GUI_Button(GUI_GridNextXn(2), GAME_GetFontLabel(font_target), NULL, colors)) {
+        win_state->editor_font = (EGUI_Font)((win_state->editor_font + 1) % EGUI_Font_Count);
+        font_target = win_state->editor_font;
+        font_setup = &setup->fonts[font_target];
+    }
+
+    GUI_GridForDuplicate();
+    GUI_Text(GUI_GridNextX(), "Preview", colors);
+    GUI_SetFont(font_target);
+    GUI_Text(GUI_GridNextXn(2), "Scale 123 Font", colors);
+    GUI_SetFont(EGUI_Font_Default);
+
+    GUI_GridForDuplicate();
+    GUI_Text(GUI_GridNextX(), "default_h", colors);
+    GUI_Float(GUI_GridNextXn(2), &font_setup->default_height, colors, 8.0f, 128.0f);
+
+    GUI_GridForDuplicate();
+    GUI_Text(GUI_GridNextX(), "border", colors);
+    GUI_Float(GUI_GridNextXn(2), &font_setup->border, colors, 0.0f, 16.0f);
+
+    GUI_GridForDuplicate();
+    GUI_Text(GUI_GridNextX(), "scale", colors);
+    GUI_Float(GUI_GridNextXn(2), &font_setup->scale, colors, 0.1f, 8.0f);
+
+    GUI_GridForDuplicate();
+    GUI_Text(GUI_GridNextX(), "spacing", colors);
+    GUI_Float(GUI_GridNextXn(2), &font_setup->spacing, colors, -8.0f, 32.0f);
+
+    GUI_GridForDuplicate();
+    GUI_Text(GUI_GridNextX(), "delta.x", colors);
+    GUI_Float(GUI_GridNextX(), &font_setup->delta.x, colors, -64.0f, 64.0f);
+    GUI_Float(GUI_GridNextX(), &font_setup->delta.y, colors, -64.0f, 64.0f);
+
+    GUI_GridForDuplicate();
+    GUI_Text(GUI_GridNextX(), "blink size", colors);
+    GUI_Float(GUI_GridNextX(), &font_setup->blink_size.x, colors, 0.0f, 32.0f);
+    GUI_Float(GUI_GridNextX(), &font_setup->blink_size.y, colors, 0.0f, 128.0f);
+
+    GUI_GridForDuplicate();
+    GUI_Text(GUI_GridNextX(), "blink delta", colors);
+    GUI_Float(GUI_GridNextX(), &font_setup->blink_delta.x, colors, -64.0f, 64.0f);
+    GUI_Float(GUI_GridNextX(), &font_setup->blink_delta.y, colors, -64.0f, 64.0f);
+
+    GUI_GridForDuplicate();
+    GUI_Text(GUI_GridNextX(), "blink alpha", colors);
+    GUI_Float(GUI_GridNextXn(2), &font_setup->blink_alpha, colors, 0.0f, 1.0f);
+
+    GUI_GridForDuplicate();
+    GUI_Text(GUI_GridNextX(), "mode", colors);
+    GUI_Text(GUI_GridNextX(), font_setup->use_custom ? "custom" : "default", colors);
+    GUI_Text(GUI_GridNextX(), font_setup->use_atlas ? "atlas" : "plain", colors);
+
+    if (font_setup->use_atlas) {
+        GUI_GridForDuplicate();
+        GUI_Text(GUI_GridNextX(), "atlas", colors);
+        GUI_Text(GUI_GridNextXn(2),
+            TextFormat("%dx%d px:%d ready:%d",
+                font_setup->atlas.atlas_width,
+                font_setup->atlas.atlas_height,
+                font_setup->atlas.pixel_size,
+                font_setup->atlas.ready),
+            colors);
+    }
+}
+
 void WIN_Logo(GUI_Window* window)
 {
     static Texture2D logo = {0};
@@ -299,6 +377,16 @@ void WIN_Winman(GUI_Window* window)
         int win_id = 5;
         if (win_settings == NULL || win_settings->id == 0) {
             win_settings = GUI_OpenWindow(win_id, "Settings", EGUI_ThemeColor_Gray, &icons->Face, true, WIN_Settings);
+        }
+        GUI_ForceZindex(win_id);
+    }
+    static GUI_Window* win_font_settings = NULL;
+    if (GUI_Button(GUI_GridNextY(), "Font settings", &icons->Setup, window->colors)) {
+        int win_id = 7;
+        if (win_font_settings == NULL || win_font_settings->id == 0) {
+            win_font_settings = GUI_OpenWindow(win_id, "Font settings", EGUI_ThemeColor_Gray, &icons->Face, true, WIN_FontSettings);
+            win_font_settings->shape.width = 520.0f;
+            win_font_settings->shape.height = 420.0f;
         }
         GUI_ForceZindex(win_id);
     }

@@ -20,6 +20,7 @@ void        GUI_BeginControlScissor(void);
 void        GUI_BeginInnerControlScissor(Rectangle shape, float border, float scale);
 // > DRAW PRIMITIVES
 void        GUI_DrawBorders(Rectangle shape, Color dark, Color light, float border, bool remove_corner);
+Vector2     GUI_MeasureText(const char* text, EGUI_Font font, float scale);
 void        GUI_DrawAdjustedTextEx(const char* text, Vector2 position, Color tint, float scale, EGUI_Font font);
 Vector2     GUI_MeasureAdjustedText(const char* text, EGUI_Font font);
 // > CURSOR
@@ -42,7 +43,7 @@ void GUI_DrawText(Rectangle shape, const char* text, EGUI_ThemeColor colors, EGU
 void GUI_Text(Rectangle shape, const char* text, EGUI_ThemeColor colors);
 // > INPUTS
 void GUI_DrawInput(Rectangle shape, char* buffer, int blink_cursor, EGUI_ControlStatus status, EGUI_ThemeColor colors, bool blink, EGUI_Font font);
-void GUI_Input(Rectangle shape, char *buffer, int buffer_size, EGUI_InputType type, EGUI_ThemeColor colors);
+void GUI_Input(Rectangle shape, void *owner, char *buffer, int buffer_size, EGUI_InputType type, EGUI_ThemeColor colors);
 void GUI_Float(Rectangle shape, float *value, EGUI_ThemeColor colors, float min, float max);
 // > CHECK
 void GUI_DrawCheck(Rectangle shape, bool value, const char *on_txt, const char *off_txt, EGUI_ControlStatus status, EGUI_ThemeColor colors, EGUI_Font font);
@@ -219,12 +220,32 @@ void GUI_DrawAdjustedTextEx(const char* text, Vector2 position, Color tint, floa
 {
     GUI_State *state        = GUI_CTX.state;
     GUI_FontSetup *setup    = GUI_GetFontSetup(font);
-
     Font font_asset         = GUI_GetFontAsset(font);
     float font_scaled       = (float)font_asset.baseSize * setup->scale * scale;
     Vector2 delta_scaled    = Vector2Scale(setup->delta, state->scale);
     Vector2 position_final  = Vector2Add(position, delta_scaled);
+    position_final.x        = SnapFloat(position_final.x);
+    position_final.y        = SnapFloat(position_final.y);
+
+    if (setup->use_atlas) {
+        GUI_DrawFontAtlasText(&setup->atlas, text, position_final, tint, setup->scale * scale, setup->spacing);
+        return;
+    }
+
     DrawTextEx(font_asset, text, position_final, font_scaled, setup->spacing, tint);
+}
+
+Vector2 GUI_MeasureText(const char* text, EGUI_Font font, float scale)
+{
+    GUI_FontSetup* setup    = GUI_GetFontSetup(font);
+
+    if (setup->use_atlas) {
+        return GUI_MeasureFontAtlasText(&setup->atlas, text, setup->scale * scale, setup->spacing);
+    }
+
+    Font font_asset         = GUI_GetFontAsset(font);
+    float font_scaled       = (float)font_asset.baseSize * setup->scale * scale;
+    return MeasureTextEx(font_asset, text, font_scaled, setup->spacing);
 }
 
 Vector2 GUI_MeasureAdjustedText(const char* text, EGUI_Font font)
@@ -232,11 +253,7 @@ Vector2 GUI_MeasureAdjustedText(const char* text, EGUI_Font font)
     // Extract data
     GUI_State *state        = GUI_CTX.state;
     GUI_FontSetup* setup    = &GUI_GetSetup()->fonts[font];
-    Font font_asset         = GUI_GetFontAsset(font);
-
-    // Process it
-    float font_scaled       = (float)font_asset.baseSize * setup->scale * state->scale;
-    Vector2 text_measure    = MeasureTextEx(font_asset, text, font_scaled, setup->spacing);
+    Vector2 text_measure    = GUI_MeasureText(text, font, state->scale);
 
     // Results (or statements)
     Vector2 result = {
@@ -626,15 +643,14 @@ void GUI_DrawInput(
 }
 
 void GUI_Input(
-    Rectangle shape, char *buffer, int buffer_size,
+    Rectangle shape, void *owner, char *buffer, int buffer_size,
     EGUI_InputType type, EGUI_ThemeColor colors)
 {
     Assert(buffer != NULL);
     Assert(buffer_size > 0);
     int max_text_size = buffer_size - 1;
 
-
-    GUI_BASE_CONTROL_FOCUSED(buffer, shape)
+    GUI_BASE_CONTROL_FOCUSED(owner, shape)
 
     // Blink (text cursor)
     static void *last_control_focus_ptr = NULL;
@@ -795,10 +811,9 @@ void GUI_Float(Rectangle shape, float *value, EGUI_ThemeColor colors, float min,
 {
     Rectangle shape_original = shape;
 
-
     static char buf_default[256] = {0};
     static char buf_focused[256] = {0};
-    GUI_BASE_CONTROL_FOCUSED(buf_focused, shape)
+    GUI_BASE_CONTROL_FOCUSED(value, shape)
 
     if (just_focused) {
         snprintf(buf_focused, sizeof(buf_focused), "%.6g", (double)*value);
@@ -806,10 +821,11 @@ void GUI_Float(Rectangle shape, float *value, EGUI_ThemeColor colors, float min,
         snprintf(buf_default, sizeof(buf_default), "%.6g", (double)*value);
     }
     char *buf = is_focused ? buf_focused : buf_default;
-    GUI_Input(shape_original, buf, (int)sizeof(buf_default), EGUI_Input_Float, colors);
+    GUI_Input(shape_original, value, buf,
+        sizeof(buf_default) /* Intentionally not using buf */,
+        EGUI_Input_Float, colors);
 
     if (is_focused) {
-        //GUI_CTX.temp->control_focus_ptr = value;
         float parsed;
         if (ParseFloatStrict(buf, &parsed)) {
             *value = Clamp(parsed, min, max);

@@ -7,6 +7,7 @@
 #endif
 
 #include "gui_base.h"
+#include "_font_ft.h"
 #include "_setup.h"
 
 // > SUBMODULES
@@ -180,4 +181,3 @@ void GUI_EndDraw(void)
 }
 // < FRAME PIPELINE
 #endif
-

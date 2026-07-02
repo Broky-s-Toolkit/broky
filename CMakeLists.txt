@@ -18,6 +18,7 @@ add_executable(broky
     src/game/_gui.h
     lib/broky/global.h
     lib/gui/gui.h
+    lib/gui/_font_ft.h
     lib/gui/_setup.h
     lib/gui/_grid.h
     lib/gui/_window.h
@@ -30,6 +31,7 @@ target_include_directories(broky PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src/game
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/broky
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/3rd
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/gui
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/rayext
     /usr/local/include

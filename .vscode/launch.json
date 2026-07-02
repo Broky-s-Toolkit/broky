@@ -12,6 +12,40 @@
       }
     },
     {
+      "name": "Debug linux fast",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/dbg-linux/run",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceRoot}/",
+      "environment": [
+        {
+          "name": "LD_LIBRARY_PATH",
+          "value": "/usr/local/lib64/:${env:LD_LIBRARY_PATH}"
+        }
+      ],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "symbolLoadInfo": {
+        "loadAll": false,
+        "exceptionList": "bin/dbg-linux/run"
+      },
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        },
+        {
+          "description": "Avoid stopping on shared library events",
+          "text": "set stop-on-solib-events 0",
+          "ignoreFailures": true
+        }
+      ]
+    },
+    {
       "name": "Debug mac",
       "type": "cppdbg",
       "request": "launch",
