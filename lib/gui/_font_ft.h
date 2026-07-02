@@ -1,15 +1,9 @@
 #pragma once
 #ifndef IDE_SYNTAX_HL
+ #define STB_TRUETYPE_IMPLEMENTATION
+ #include <stb_truetype.h>
  #include "gui_base.h"
 #endif
-
-#ifdef IMPLEMENT_ALL
- #ifndef STB_TRUETYPE_IMPLEMENTATION
-  #define STB_TRUETYPE_IMPLEMENTATION
- #endif
-#endif
-
-#include <stb_truetype.h>
 
 GUI_FontAtlas GUI_LoadFontAtlasASCII(const char *path, int pixel_size);
 void          GUI_DrawFontAtlasText(const GUI_FontAtlas *atlas, const char *text, Vector2 position, Color tint, float scale, float spacing);

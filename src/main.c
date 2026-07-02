@@ -1,5 +1,8 @@
 #define IDE_SYNTAX_HL 0
 #define IMPLEMENT_ALL 1
+#define STB_TRUETYPE_IMPLEMENTATION
+#include <stb_truetype.h>
+#include "gui_base.h"
 
 #include "common.h"
 #include "game/main.h"
