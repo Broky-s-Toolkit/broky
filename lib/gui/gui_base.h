@@ -141,6 +141,7 @@ typedef struct {
     bool            use_custom;        // Indicates if a custom font is used
     bool            use_atlas;
     GUI_FontAtlas   atlas;
+    int             atlas_reload_size;
     float           spacing;
     Vector2         blink_size;        // Size of the blinking cursor
     Vector2         blink_delta;      // Blink adjustment

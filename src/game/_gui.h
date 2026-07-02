@@ -302,6 +302,19 @@ void WIN_FontSettings(GUI_Window* window)
     GUI_Text(GUI_GridNextX(), font_setup->use_custom ? "custom" : "default", colors);
     GUI_Text(GUI_GridNextX(), font_setup->use_atlas ? "atlas" : "plain", colors);
 
+    GUI_GridForDuplicate();
+    GUI_Text(GUI_GridNextX(), "reload", colors);
+    if (font_setup->use_atlas) {
+        float atlas_reload_size = (float)font_setup->atlas_reload_size;
+        GUI_Float(GUI_GridNextX(), &atlas_reload_size, colors, 8.0f, 128.0f);
+        font_setup->atlas_reload_size = (int)roundf(atlas_reload_size);
+    } else {
+        GUI_Text(GUI_GridNextX(), "-", colors);
+    }
+    if (GUI_Button(GUI_GridNextX(), "Reload", NULL, colors)) {
+        GUI_ReloadFontSetupAsset(font_target);
+    }
+
     if (font_setup->use_atlas) {
         GUI_GridForDuplicate();
         GUI_Text(GUI_GridNextX(), "atlas", colors);

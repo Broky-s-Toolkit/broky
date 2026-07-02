@@ -12,6 +12,7 @@ GUI_CursorSetup     GUI_LoadCursorSetupForType(EGUI_Cursor cursor);
 GUI_CursorSetup*    GUI_GetCursorSetup(void);
 // > FONTS
 GUI_FontSetup       GUI_LoadFontSetupDefault(EGUI_Font font);
+void                GUI_ReloadFontSetupAsset(EGUI_Font font);
 GUI_FontSetup*      GUI_GetFontSetup(EGUI_Font font);
 Font                GUI_GetFontAsset(EGUI_Font font);
 EGUI_Font           GUI_GetFont(void);
@@ -97,6 +98,19 @@ GUI_CursorSetup* GUI_GetCursorSetup(void)
 // < CURSORS
 
 // > FONTS
+static const char *GUI_GetFontAssetPath(EGUI_Font font)
+{
+    switch (font) {
+    case EGUI_Font_ShareTech:
+        return BROKY_FNT_ROOT "/ShareTech-Regular.ttf";
+    case EGUI_Font_Default:
+        return BROKY_FNT_ROOT "/unifont-17.0.01.otf";
+    case EGUI_Font_GUI:
+    default:
+        return NULL;
+    }
+}
+
 GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
 {
     _Static_assert(EGUI_Font_Count == 3,  "Update fonts here");
@@ -112,6 +126,7 @@ GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
             .use_custom     = false,
             .use_atlas      = false,
             .atlas          = { 0 },
+            .atlas_reload_size = 32,
             .spacing        = 1.0f,
             .blink_size     = (Vector2){ 1.0f, 30.0f },
             .blink_delta    = (Vector2){ 0.0f, 0.0f },
@@ -129,6 +144,7 @@ GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
             .use_custom     = false,
             .use_atlas      = true,
             .atlas          = { 0 },
+            .atlas_reload_size = 32,
             .spacing        = 1.0f,
             .blink_size     = (Vector2){ 1.0f, 30.0f },
             .blink_delta    = (Vector2){ 0.0f, 0.0f },
@@ -148,12 +164,13 @@ GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
             .use_custom     = true,
             .use_atlas      = false,
             .atlas          = { 0 },
+            .atlas_reload_size = 32,
             .spacing        = 1.0f,
             .blink_size     = (Vector2){ 1.0f, 30.0f },
             .blink_delta    = (Vector2){ 0.0f, 0.0f },
             .blink_alpha    = 0.95f
         };
-        SetTextureFilter(result.custom.texture, TEXTURE_FILTER_POINT);
+        SetTextureFilter(result.custom.texture, TEXTURE_FILTER_BILINEAR);
         return result;
     }
     } // Switch
@@ -176,6 +193,42 @@ EGUI_Font GUI_GetFont(void)
 {
     EGUI_Font font = GUI_CTX.temp->current_font;
     return font;
+}
+
+void GUI_ReloadFontSetupAsset(EGUI_Font font)
+{
+    GUI_FontSetup *font_setup = GUI_GetFontSetup(font);
+    const char *asset_path = GUI_GetFontAssetPath(font);
+
+    if (font_setup->use_atlas) {
+        int pixel_size = font_setup->atlas_reload_size > 0
+            ? font_setup->atlas_reload_size
+            : (font_setup->atlas.pixel_size > 0 ? font_setup->atlas.pixel_size : 32);
+
+        if (font_setup->atlas.ready || font_setup->atlas.texture.id != 0) {
+            GUI_UnloadFontAtlas(&font_setup->atlas);
+        }
+
+        if (asset_path != NULL) {
+            font_setup->atlas = GUI_LoadFontAtlasASCII(asset_path, pixel_size);
+            font_setup->atlas_reload_size = pixel_size;
+        }
+    }
+
+    if (font_setup->use_custom) {
+        if (font_setup->custom.texture.id != 0) {
+            UnloadFont(font_setup->custom);
+            font_setup->custom = (Font){ 0 };
+        }
+
+        if (asset_path != NULL) {
+            int font_size = 16;
+            font_setup->custom = LoadFontEx(asset_path, font_size, 0, 0);
+            if (font_setup->custom.texture.id != 0) {
+                SetTextureFilter(font_setup->custom.texture, TEXTURE_FILTER_BILINEAR);
+            }
+        }
+    }
 }
 
 void GUI_SetFont(EGUI_Font font)

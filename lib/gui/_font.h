@@ -6,6 +6,7 @@
 #endif
 
 GUI_FontAtlas GUI_LoadFontAtlasASCII(const char *path, int pixel_size);
+void          GUI_UnloadFontAtlas(GUI_FontAtlas *atlas);
 void          GUI_DrawFontAtlasText(const GUI_FontAtlas *atlas, const char *text, Vector2 position, Color tint, float scale, float spacing);
 Vector2       GUI_MeasureFontAtlasText(const GUI_FontAtlas *atlas, const char *text, float scale, float spacing);
 
@@ -118,11 +119,24 @@ GUI_FontAtlas GUI_LoadFontAtlasASCII(const char *path, int pixel_size)
     UnloadFileData(font_data);
 
     if (atlas.texture.id != 0) {
-        SetTextureFilter(atlas.texture, TEXTURE_FILTER_POINT);
+        SetTextureFilter(atlas.texture, TEXTURE_FILTER_BILINEAR);
         atlas.ready = true;
     }
 
     return atlas;
+}
+
+void GUI_UnloadFontAtlas(GUI_FontAtlas *atlas)
+{
+    if (atlas == NULL) {
+        return;
+    }
+
+    if (atlas->texture.id != 0) {
+        UnloadTexture(atlas->texture);
+    }
+
+    memset(atlas, 0, sizeof(*atlas));
 }
 
 void GUI_DrawFontAtlasText(const GUI_FontAtlas *atlas, const char *text, Vector2 position, Color tint, float scale, float spacing)
