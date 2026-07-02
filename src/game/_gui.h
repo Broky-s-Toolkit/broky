@@ -254,18 +254,13 @@ void WIN_FontSettings(GUI_Window* window)
     GUI_SetFont(EGUI_Font_Default);
     GUI_GridForCols(3, GUI_CalcDefaultHeightScaled(GUI_GetFont()));
 
+    GUI_GridForDuplicate();
     GUI_Text(GUI_GridNextX(), "Editing", colors);
     if (GUI_Button(GUI_GridNextXn(2), GAME_GetFontLabel(font_target), NULL, colors)) {
         win_state->editor_font = (EGUI_Font)((win_state->editor_font + 1) % EGUI_Font_Count);
         font_target = win_state->editor_font;
         font_setup = &setup->fonts[font_target];
     }
-
-    GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "Preview", colors);
-    GUI_SetFont(font_target);
-    GUI_Text(GUI_GridNextXn(2), "Scale 123 Font", colors);
-    GUI_SetFont(EGUI_Font_Default);
 
     GUI_GridForDuplicate();
     GUI_Text(GUI_GridNextX(), "default_h", colors);
@@ -302,7 +297,7 @@ void WIN_FontSettings(GUI_Window* window)
     GUI_Text(GUI_GridNextX(), "blink alpha", colors);
     GUI_Float(GUI_GridNextXn(2), &font_setup->blink_alpha, colors, 0.0f, 1.0f);
 
-    GUI_GridForDuplicate();
+
     GUI_Text(GUI_GridNextX(), "mode", colors);
     GUI_Text(GUI_GridNextX(), font_setup->use_custom ? "custom" : "default", colors);
     GUI_Text(GUI_GridNextX(), font_setup->use_atlas ? "atlas" : "plain", colors);
@@ -318,6 +313,11 @@ void WIN_FontSettings(GUI_Window* window)
                 font_setup->atlas.ready),
             colors);
     }
+
+    GUI_GridForDuplicate();
+    GUI_Text(GUI_GridNextX(), "Preview", colors);
+    GUI_SetFont(font_target);
+    GUI_Text(GUI_GridNextXn(2), "Scale 123 Font", colors);
 }
 
 void WIN_Logo(GUI_Window* window)
