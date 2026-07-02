@@ -233,7 +233,7 @@ typedef struct {
 
 
 typedef struct {
-    const char      *id_ptr;            // Control Owner. A unique pointer representing the control owner
+    const void      *id_ptr;            // Control Owner. A unique pointer representing the control owner
     GUI_GridTemp    grid;               // Grid state when the overlay draw was queued
     EGUI_ThemeColor colors;             // Colors when the overlay draw was queued
     bool            just_enabled;       // TRUE if the overlay was JUST ENABLED on this frame

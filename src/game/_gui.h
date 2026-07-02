@@ -9,6 +9,7 @@
 //
 void GUI_ProgramMenu();
 void GUI_GameMenu();
+void GUI_FontSettingsMenu();
 void GUI_TopBar();
 void WIN_Window(GUI_Window* window);
 void WIN_Layouts(GUI_Window* window);
@@ -47,6 +48,33 @@ void GUI_GameMenu()
         actions->add_character       = GUI_Button(GUI_GridAt(-1,2), "Add",      &icons->Open,   colors);
         actions->toggle_character    = GUI_Button(GUI_GridAt(-1,3), "Change",   &icons->Error,  colors);
     GUI_EndOverlay(GUI_GridBetween(-1, 1, -1, 3));
+}
+
+void GUI_FontSettingsMenu()
+{
+    GAME_WindowState *win_state = GAME_CTX.win_state;
+    EGUI_ThemeColor colors = GUI_OverlayColors();
+
+    GUI_BeginOverlay(true, true);
+        GUI_SetFont(EGUI_Font_Default);
+        GUI_Button(GUI_GridBetween(-2, 0, -1, 0), "Select font", NULL, colors);
+
+        Rectangle menu_0        = GUI_GridBetween(-2, 1, -1, 1);
+        Rectangle menu_1        = GUI_GridBetween(-2, 2, -1, 2);
+        Rectangle menu_2        = GUI_GridBetween(-2, 3, -1, 3);
+        Rectangle final_shape   = GUI_GridBetween(-2, 1, -1, 3);
+        if (GUI_OverlayWasJustEnabled() == false) {
+            if (GUI_Button(menu_0, "Default", NULL, win_state->editor_font == EGUI_Font_Default ? EGUI_ThemeColor_Red : colors)) {
+                win_state->editor_font = EGUI_Font_Default;
+            }
+            if (GUI_Button(menu_1, "GUI", NULL, win_state->editor_font == EGUI_Font_GUI ? EGUI_ThemeColor_Red : colors)) {
+                win_state->editor_font = EGUI_Font_GUI;
+            }
+            if (GUI_Button(menu_2, "ShareTech", NULL, win_state->editor_font == EGUI_Font_ShareTech ? EGUI_ThemeColor_Red : colors)) {
+                win_state->editor_font = EGUI_Font_ShareTech;
+            }
+        }
+    GUI_EndOverlay(final_shape);
 }
 
 void GUI_TopBar()
@@ -256,11 +284,9 @@ void WIN_FontSettings(GUI_Window* window)
 
     GUI_GridForDuplicate();
     GUI_Text(GUI_GridNextX(), "Editing", colors);
-    if (GUI_Button(GUI_GridNextXn(2), GAME_GetFontLabel(font_target), NULL, colors)) {
-        win_state->editor_font = (EGUI_Font)((win_state->editor_font + 1) % EGUI_Font_Count);
-        font_target = win_state->editor_font;
-        font_setup = &setup->fonts[font_target];
-    }
+    GUI_ButtonMenu(GUI_GridNextXn(2), GAME_GetFontLabel(font_target), NULL, colors, GUI_FontSettingsMenu);
+    font_target = win_state->editor_font;
+    font_setup = &setup->fonts[font_target];
 
     GUI_GridForDuplicate();
     GUI_Text(GUI_GridNextX(), "default_h", colors);

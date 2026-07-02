@@ -9,11 +9,11 @@
 // > INDEX
 GUI_Overlay     GUI_MakeOverlay(void);
 void            GUI_DrawOverlay(void);
-bool            GUI_OverlayOpenedBy(const char* text_id_owner);
+bool            GUI_OverlayOpenedBy(const void* owner_id);
 bool            GUI_OverlayWasJustEnabled(void);
 EGUI_ThemeColor GUI_OverlayColors(void);
 void            GUI_OverlayClose(void);
-void            GUI_OverlayOpenFor(const char* id);
+void            GUI_OverlayOpenFor(const void* id);
 void            GUI_OverlaySetDrawCall(bool just_enabled, EGUI_ThemeColor colors, void (*draw_function)(void));
 void            GUI_OverlaySetFinalShape(Rectangle shape);
 bool            GUI_OverlayIsDrawing(void);
@@ -52,9 +52,9 @@ void GUI_DrawOverlay(void)
     }
 }
 
-bool GUI_OverlayOpenedBy(const char* text_id_owner)
+bool GUI_OverlayOpenedBy(const void* owner_id)
 {
-    return GUI_CTX.temp->overlay.id_ptr == text_id_owner;
+    return GUI_CTX.temp->overlay.id_ptr == owner_id;
 }
 
 bool GUI_OverlayWasJustEnabled(void)
@@ -72,7 +72,7 @@ void GUI_OverlayClose(void)
     GUI_CTX.temp->overlay = GUI_MakeOverlay();
 }
 
-void GUI_OverlayOpenFor(const char* id)
+void GUI_OverlayOpenFor(const void* id)
 {
     Assert(id != NULL);
     GUI_CTX.temp->overlay.id_ptr            = id;
@@ -127,6 +127,9 @@ void GUI_EndOverlay(Rectangle final_shape)
         GUI_OverlayClose();
     } else {
         GUI_OverlaySetFinalShape(final_shape);
+        if (DEV_DEBUG_GUI_OVERLAY) {
+            DrawDebugRect(final_shape, RED);
+        }
     }
     // End drawing
     GUI_CTX.temp->overlay.is_drawing = false;
