@@ -1,4 +1,5 @@
 #pragma once
+#include "_controls.h"
 #ifndef IDE_SYNTAX_HL
 #define IMPLEMENT_ALL   1
 #include "../common.h"
@@ -63,7 +64,8 @@ void GUI_FontSettingsMenu()
         Rectangle menu_1        = GUI_GridBetween(-2, 2, -1, 2);
         Rectangle menu_2        = GUI_GridBetween(-2, 3, -1, 3);
         Rectangle final_shape   = GUI_GridBetween(-2, 1, -1, 3);
-        
+
+        GUI_DrawShadow(final_shape);
         if (GUI_OverlayWasJustEnabled() == false) {
             if (GUI_Button(menu_0, "Default", NULL, win_state->editor_font == EGUI_Font_Default ? EGUI_ThemeColor_Red : EGUI_ThemeColor_Green)) {
                 win_state->editor_font = EGUI_Font_Default;

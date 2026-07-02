@@ -19,6 +19,7 @@ Rectangle   GUI_ControlShapeCut(Rectangle shape, float border, float scale, bool
 void        GUI_BeginControlScissor(void);
 void        GUI_BeginInnerControlScissor(Rectangle shape, float border, float scale);
 // > DRAW PRIMITIVES
+void        GUI_DrawShadow(Rectangle shape);
 void        GUI_DrawBorders(Rectangle shape, Color dark, Color light, float border, bool remove_corner);
 Vector2     GUI_MeasureText(const char* text, EGUI_Font font, float scale);
 void        GUI_DrawAdjustedTextEx(const char* text, Vector2 position, Color tint, float scale, EGUI_Font font);
@@ -190,6 +191,15 @@ void GUI_BeginInnerControlScissor(Rectangle shape, float border, float scale)
 // < END CONTROL HELPERS
 
 // > DRAW PRIMITIVES
+void GUI_DrawShadow(Rectangle shape)
+{
+    Rectangle shadow = shape;
+    // TODO@dc: improve
+    shadow.x -= 2.0f;
+    shadow.y += 2.0f;
+    DrawRectangleRec(shadow, ColorAlpha(BLACK, 0.35f));
+}
+
 void GUI_DrawBorders(Rectangle shape, Color dark, Color light, float border, bool remove_corner)
 {
     if (!remove_corner) {
