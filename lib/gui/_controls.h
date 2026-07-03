@@ -138,7 +138,7 @@ void GUI_DrawAdjustedTextEx(const char* text, Vector2 position, Color tint, floa
     position_final.x        = SnapFloat(position_final.x);
     position_final.y        = SnapFloat(position_final.y);
 
-    if (setup->use_atlas) {
+    if (setup->atlas.ready) {
         GUI_DrawFontAtlasText(&setup->atlas, text, position_final, tint, setup->scale * scale, setup->spacing);
         return;
     }
@@ -150,7 +150,7 @@ Vector2 GUI_MeasureText(const char* text, EGUI_Font font, float scale)
 {
     GUI_FontSetup* setup    = GUI_GetFontSetup(font);
 
-    if (setup->use_atlas) {
+    if (setup->atlas.ready) {
         return GUI_MeasureFontAtlasText(&setup->atlas, text, setup->scale * scale, setup->spacing);
     }
 

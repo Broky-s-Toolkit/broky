@@ -323,12 +323,36 @@ void WIN_FontSettings(GUI_Window* window)
     GUI_Text(GUI_GridNextX(), "blink alpha", colors);
     GUI_Float(GUI_GridNextXn(2), &font_setup->blink_alpha, colors, 0.0f, 1.0f);
 
+    GUI_GridForDuplicate();
+    GUI_Text(GUI_GridNextX(), "filter", colors);
+    if (GUI_Button(GUI_GridNextXn(2), GUI_GetTextureFilterLabel(font_setup->texture_filter), NULL, colors)) {
+        switch (font_setup->texture_filter) {
+        case TEXTURE_FILTER_POINT:
+            font_setup->texture_filter = TEXTURE_FILTER_BILINEAR;
+            break;
+        case TEXTURE_FILTER_BILINEAR:
+            font_setup->texture_filter = TEXTURE_FILTER_TRILINEAR;
+            break;
+        case TEXTURE_FILTER_TRILINEAR:
+        default:
+            font_setup->texture_filter = TEXTURE_FILTER_POINT;
+            break;
+        }
+    }
+    GUI_GridForDuplicate();
+    GUI_GridNextX();
+    GUI_Text(GUI_GridNextX(), "combine with scale with decimal values", colors);
 
+    bool use_atlas = font_setup->atlas_reload_size > 0
+        || font_setup->atlas.ready
+        || font_setup->atlas.texture.id != 0;
+
+    GUI_GridForDuplicate();
     GUI_Text(GUI_GridNextX(), "mode", colors);
-    GUI_Text(GUI_GridNextX(), font_setup->use_atlas ? "atlas" : "plain", colors);
+    GUI_Text(GUI_GridNextX(), use_atlas ? "atlas" : "plain", colors);
     GUI_GridForDuplicate();
     GUI_Text(GUI_GridNextX(), "reload", colors);
-    if (font_setup->use_atlas) {
+    if (use_atlas) {
         float atlas_reload_size = (float)font_setup->atlas_reload_size;
         GUI_Float(GUI_GridNextX(), &atlas_reload_size, colors, 8.0f, 128.0f);
         font_setup->atlas_reload_size = (int)roundf(atlas_reload_size);
@@ -339,7 +363,7 @@ void WIN_FontSettings(GUI_Window* window)
         GUI_ReloadFontSetupAsset(font_target);
     }
 
-    if (font_setup->use_atlas) {
+    if (use_atlas) {
         GUI_GridForDuplicate();
         GUI_Text(GUI_GridNextX(), "atlas", colors);
         GUI_Text(GUI_GridNextXn(2),

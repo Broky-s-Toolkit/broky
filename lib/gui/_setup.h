@@ -15,6 +15,7 @@ GUI_CursorSetup*    GUI_GetCursorSetup(void);
 GUI_FontSetup       GUI_LoadFontSetupDefault(EGUI_Font font);
 void                GUI_ReloadFontSetupAsset(EGUI_Font font);
 GUI_FontSetup*      GUI_GetFontSetup(EGUI_Font font);
+const char*         GUI_GetTextureFilterLabel(int texture_filter);
 Font                GUI_GetFontAsset(EGUI_Font font);
 EGUI_Font           GUI_GetFont(void);
 void                GUI_SetFont(EGUI_Font font);
@@ -112,6 +113,19 @@ static const char *GUI_GetFontAssetPath(EGUI_Font font)
     }
 }
 
+const char* GUI_GetTextureFilterLabel(int texture_filter)
+{
+    switch (texture_filter) {
+    case TEXTURE_FILTER_POINT:
+        return "point";
+    case TEXTURE_FILTER_TRILINEAR:
+        return "trilinear";
+    case TEXTURE_FILTER_BILINEAR:
+    default:
+        return "bilinear";
+    }
+}
+
 GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
 {
     _Static_assert(EGUI_Font_Count == 3,  "Update fonts here");
@@ -124,11 +138,9 @@ GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
             .scale          = 2.0f,
             .delta          = (Vector2){ 6.0f, 6.0f },
             .custom         = { 0 },
-            .custom_texture_filter = TEXTURE_FILTER_BILINEAR,
-            .use_atlas      = false,
+            .texture_filter = TEXTURE_FILTER_BILINEAR,
             .atlas          = { 0 },
-            .atlas_texture_filter = TEXTURE_FILTER_BILINEAR,
-            .atlas_reload_size = 32,
+            .atlas_reload_size = 0,
             .spacing        = 1.0f,
             .blink_size     = (Vector2){ 1.0f, 30.0f },
             .blink_delta    = (Vector2){ 0.0f, 0.0f },
@@ -143,10 +155,8 @@ GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
             .scale          = 1.0f,
             .delta          = (Vector2){ 6.0f, 6.0f },
             .custom         = { 0 },
-            .custom_texture_filter = TEXTURE_FILTER_BILINEAR,
-            .use_atlas      = true,
+            .texture_filter = TEXTURE_FILTER_BILINEAR,
             .atlas          = { 0 },
-            .atlas_texture_filter = TEXTURE_FILTER_BILINEAR,
             .atlas_reload_size = 32,
             .spacing        = 1.0f,
             .blink_size     = (Vector2){ 1.0f, 30.0f },
@@ -155,7 +165,7 @@ GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
         };
         result.atlas = GUI_LoadFontAtlasASCII(BROKY_FNT_ROOT "/ShareTech-Regular.ttf", 32);
         if (result.atlas.texture.id != 0) {
-            SetTextureFilter(result.atlas.texture, result.atlas_texture_filter);
+            SetTextureFilter(result.atlas.texture, result.texture_filter);
         }
         return result;
     }
@@ -167,18 +177,16 @@ GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
             .scale          = 1.0f,
             .delta          = (Vector2){ 6.0f, 6.0f },
             .custom         = LoadFontEx(BROKY_FNT_ROOT "/unifont-17.0.01.otf", 16, 0, 0),
-            .custom_texture_filter = TEXTURE_FILTER_BILINEAR,
-            .use_atlas      = false,
+            .texture_filter = TEXTURE_FILTER_BILINEAR,
             .atlas          = { 0 },
-            .atlas_texture_filter = TEXTURE_FILTER_BILINEAR,
-            .atlas_reload_size = 32,
+            .atlas_reload_size = 0,
             .spacing        = 1.0f,
             .blink_size     = (Vector2){ 1.0f, 30.0f },
             .blink_delta    = (Vector2){ 0.0f, 0.0f },
             .blink_alpha    = 0.95f
         };
         if (result.custom.texture.id != 0) {
-            SetTextureFilter(result.custom.texture, result.custom_texture_filter);
+            SetTextureFilter(result.custom.texture, result.texture_filter);
         }
         return result;
     }
@@ -193,9 +201,11 @@ GUI_FontSetup* GUI_GetFontSetup(EGUI_Font font)
 Font GUI_GetFontAsset(EGUI_Font font)
 {
     GUI_Setup *setup = GUI_CTX.setup;
-    if (setup->fonts[font].custom == 0)
-        return GetFontDefault();
-    return setup->fonts[font].custom;
+    if (setup->fonts[font].custom.texture.id != 0) {
+        return setup->fonts[font].custom;
+    }
+
+    return GetFontDefault();
 }
 
 EGUI_Font GUI_GetFont(void)
@@ -208,7 +218,9 @@ void GUI_ReloadFontSetupAsset(EGUI_Font font)
 {
     GUI_FontSetup *font_setup   = GUI_GetFontSetup(font);
     const char *asset_path      = GUI_GetFontAssetPath(font);
-    bool use_atlas              = font_setup->use_atlas;
+    bool use_atlas              = font_setup->atlas_reload_size > 0
+        || font_setup->atlas.ready
+        || font_setup->atlas.texture.id != 0;
 
     if (use_atlas) {
         int pixel_size = font_setup->atlas_reload_size > 0
@@ -223,7 +235,7 @@ void GUI_ReloadFontSetupAsset(EGUI_Font font)
             font_setup->atlas = GUI_LoadFontAtlasASCII(asset_path, pixel_size);
             font_setup->atlas_reload_size = pixel_size;
             if (font_setup->atlas.texture.id != 0) {
-                SetTextureFilter(font_setup->atlas.texture, font_setup->atlas_texture_filter);
+                SetTextureFilter(font_setup->atlas.texture, font_setup->texture_filter);
             }
         }
     }
@@ -237,7 +249,7 @@ void GUI_ReloadFontSetupAsset(EGUI_Font font)
             int font_size = 16;
             font_setup->custom = LoadFontEx(asset_path, font_size, 0, 0);
             if (font_setup->custom.texture.id != 0) {
-                SetTextureFilter(font_setup->custom.texture, font_setup->custom_texture_filter);
+                SetTextureFilter(font_setup->custom.texture, font_setup->texture_filter);
             }
         }
     }
