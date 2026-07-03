@@ -325,9 +325,7 @@ void WIN_FontSettings(GUI_Window* window)
 
 
     GUI_Text(GUI_GridNextX(), "mode", colors);
-    GUI_Text(GUI_GridNextX(), font_setup->use_custom ? "custom" : "default", colors);
     GUI_Text(GUI_GridNextX(), font_setup->use_atlas ? "atlas" : "plain", colors);
-
     GUI_GridForDuplicate();
     GUI_Text(GUI_GridNextX(), "reload", colors);
     if (font_setup->use_atlas) {

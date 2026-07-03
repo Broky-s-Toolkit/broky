@@ -125,7 +125,6 @@ GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
             .delta          = (Vector2){ 6.0f, 6.0f },
             .custom         = { 0 },
             .custom_texture_filter = TEXTURE_FILTER_BILINEAR,
-            .use_custom     = false,
             .use_atlas      = false,
             .atlas          = { 0 },
             .atlas_texture_filter = TEXTURE_FILTER_BILINEAR,
@@ -145,7 +144,6 @@ GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
             .delta          = (Vector2){ 6.0f, 6.0f },
             .custom         = { 0 },
             .custom_texture_filter = TEXTURE_FILTER_BILINEAR,
-            .use_custom     = false,
             .use_atlas      = true,
             .atlas          = { 0 },
             .atlas_texture_filter = TEXTURE_FILTER_BILINEAR,
@@ -170,7 +168,6 @@ GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
             .delta          = (Vector2){ 6.0f, 6.0f },
             .custom         = LoadFontEx(BROKY_FNT_ROOT "/unifont-17.0.01.otf", 16, 0, 0),
             .custom_texture_filter = TEXTURE_FILTER_BILINEAR,
-            .use_custom     = true,
             .use_atlas      = false,
             .atlas          = { 0 },
             .atlas_texture_filter = TEXTURE_FILTER_BILINEAR,
@@ -196,11 +193,11 @@ GUI_FontSetup* GUI_GetFontSetup(EGUI_Font font)
 Font GUI_GetFontAsset(EGUI_Font font)
 {
     GUI_Setup *setup = GUI_CTX.setup;
-    if (setup->fonts[font].use_custom)
-        return setup->fonts[font].custom;
-    else
+    if (setup->fonts[font].custom == 0)
         return GetFontDefault();
+    return setup->fonts[font].custom;
 }
+
 EGUI_Font GUI_GetFont(void)
 {
     EGUI_Font font = GUI_CTX.temp->current_font;
@@ -209,10 +206,11 @@ EGUI_Font GUI_GetFont(void)
 
 void GUI_ReloadFontSetupAsset(EGUI_Font font)
 {
-    GUI_FontSetup *font_setup = GUI_GetFontSetup(font);
-    const char *asset_path = GUI_GetFontAssetPath(font);
+    GUI_FontSetup *font_setup   = GUI_GetFontSetup(font);
+    const char *asset_path      = GUI_GetFontAssetPath(font);
+    bool use_atlas              = font_setup->use_atlas;
 
-    if (font_setup->use_atlas) {
+    if (use_atlas) {
         int pixel_size = font_setup->atlas_reload_size > 0
             ? font_setup->atlas_reload_size
             : (font_setup->atlas.pixel_size > 0 ? font_setup->atlas.pixel_size : 32);
@@ -230,12 +228,11 @@ void GUI_ReloadFontSetupAsset(EGUI_Font font)
         }
     }
 
-    if (font_setup->use_custom) {
+    if (use_atlas == false) {
         if (font_setup->custom.texture.id != 0) {
             UnloadFont(font_setup->custom);
             font_setup->custom = (Font){ 0 };
         }
-
         if (asset_path != NULL) {
             int font_size = 16;
             font_setup->custom = LoadFontEx(asset_path, font_size, 0, 0);
