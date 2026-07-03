@@ -9,7 +9,8 @@ ES: [Guía de instalacion](https://thescienceofcode.com/es/raylib-vscode-c-cpp-d
   * Tasks already created.
   * dev/dc/settings.json contains some experimental settings for the IDE.
 * CLion:
-  * CMakeLists already created.
+  * Build/run uses the scripts in `run/`.
+  * `CMakeLists.txt` is only there for editor support and indexing.
   * Debugger files.
   * Tasks.
   * .idea/settings contain a settings backup ready to set yor env.
@@ -18,7 +19,7 @@ ES: [Guía de instalacion](https://thescienceofcode.com/es/raylib-vscode-c-cpp-d
 
 ## 🧱 Project Structure
 
-**Folders use 3-letter prefixes (except root):**
+**Folders use 3-letter prefixes:**
 
 ```
 art     assets
@@ -32,11 +33,11 @@ tmp     temporary build folder
 ### src
 
 ```
-main.c              →  entrypoint
-module/
-module/main.h       →  module entrypoint
-module/structs.h    →  module structs (enums, state, temp)
-module/layout.h     →  layout submodule
+main.c                  entrypoint
+module/__core.h         module core
+module/_submodule.h     submodule
+module/_other.h         other submodule
+module/module.h         module build entrypoint (.h with imports)
 ```
 
 ---
