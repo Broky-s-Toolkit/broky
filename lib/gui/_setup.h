@@ -1,6 +1,6 @@
 #pragma once
 #ifndef IDE_SYNTAX_HL
- #include "__core.hh"
+ #include "__core.h"
  #include "_font.h"
 #endif
 
@@ -124,9 +124,11 @@ GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
             .scale          = 2.0f,
             .delta          = (Vector2){ 6.0f, 6.0f },
             .custom         = { 0 },
+            .custom_texture_filter = TEXTURE_FILTER_BILINEAR,
             .use_custom     = false,
             .use_atlas      = false,
             .atlas          = { 0 },
+            .atlas_texture_filter = TEXTURE_FILTER_BILINEAR,
             .atlas_reload_size = 32,
             .spacing        = 1.0f,
             .blink_size     = (Vector2){ 1.0f, 30.0f },
@@ -142,9 +144,11 @@ GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
             .scale          = 1.0f,
             .delta          = (Vector2){ 6.0f, 6.0f },
             .custom         = { 0 },
+            .custom_texture_filter = TEXTURE_FILTER_BILINEAR,
             .use_custom     = false,
             .use_atlas      = true,
             .atlas          = { 0 },
+            .atlas_texture_filter = TEXTURE_FILTER_BILINEAR,
             .atlas_reload_size = 32,
             .spacing        = 1.0f,
             .blink_size     = (Vector2){ 1.0f, 30.0f },
@@ -152,6 +156,9 @@ GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
             .blink_alpha    = 0.95f
         };
         result.atlas = GUI_LoadFontAtlasASCII(BROKY_FNT_ROOT "/ShareTech-Regular.ttf", 32);
+        if (result.atlas.texture.id != 0) {
+            SetTextureFilter(result.atlas.texture, result.atlas_texture_filter);
+        }
         return result;
     }
     case EGUI_Font_Default:
@@ -162,16 +169,20 @@ GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
             .scale          = 1.0f,
             .delta          = (Vector2){ 6.0f, 6.0f },
             .custom         = LoadFontEx(BROKY_FNT_ROOT "/unifont-17.0.01.otf", 16, 0, 0),
+            .custom_texture_filter = TEXTURE_FILTER_BILINEAR,
             .use_custom     = true,
             .use_atlas      = false,
             .atlas          = { 0 },
+            .atlas_texture_filter = TEXTURE_FILTER_BILINEAR,
             .atlas_reload_size = 32,
             .spacing        = 1.0f,
             .blink_size     = (Vector2){ 1.0f, 30.0f },
             .blink_delta    = (Vector2){ 0.0f, 0.0f },
             .blink_alpha    = 0.95f
         };
-        SetTextureFilter(result.custom.texture, TEXTURE_FILTER_BILINEAR);
+        if (result.custom.texture.id != 0) {
+            SetTextureFilter(result.custom.texture, result.custom_texture_filter);
+        }
         return result;
     }
     } // Switch
@@ -213,6 +224,9 @@ void GUI_ReloadFontSetupAsset(EGUI_Font font)
         if (asset_path != NULL) {
             font_setup->atlas = GUI_LoadFontAtlasASCII(asset_path, pixel_size);
             font_setup->atlas_reload_size = pixel_size;
+            if (font_setup->atlas.texture.id != 0) {
+                SetTextureFilter(font_setup->atlas.texture, font_setup->atlas_texture_filter);
+            }
         }
     }
 
@@ -226,7 +240,7 @@ void GUI_ReloadFontSetupAsset(EGUI_Font font)
             int font_size = 16;
             font_setup->custom = LoadFontEx(asset_path, font_size, 0, 0);
             if (font_setup->custom.texture.id != 0) {
-                SetTextureFilter(font_setup->custom.texture, TEXTURE_FILTER_BILINEAR);
+                SetTextureFilter(font_setup->custom.texture, font_setup->custom_texture_filter);
             }
         }
     }

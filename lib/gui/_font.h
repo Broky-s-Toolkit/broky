@@ -119,7 +119,6 @@ GUI_FontAtlas GUI_LoadFontAtlasASCII(const char *path, int pixel_size)
     UnloadFileData(font_data);
 
     if (atlas.texture.id != 0) {
-        SetTextureFilter(atlas.texture, TEXTURE_FILTER_BILINEAR);
         atlas.ready = true;
     }
 

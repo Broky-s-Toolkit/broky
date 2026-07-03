@@ -138,9 +138,11 @@ typedef struct {
     float           scale;
     Vector2         delta;             // Delta adjustment
     Font            custom;
+    int             custom_texture_filter;
     bool            use_custom;        // Indicates if a custom font is used
     bool            use_atlas;
     GUI_FontAtlas   atlas;
+    int             atlas_texture_filter;
     int             atlas_reload_size;
     float           spacing;
     Vector2         blink_size;        // Size of the blinking cursor
