@@ -1,8 +1,5 @@
 -I/home/dacanizares/source/broky/src
--I/home/dacanizares/source/broky/lib/3rd
--I/home/dacanizares/source/broky/lib/gui
--I/home/dacanizares/source/broky/lib/rayext
--I/home/dacanizares/source/broky/lib/broky
+-I/home/dacanizares/source/broky/lib
 -I/usr/local/include
 -I/usr/include/libpng16
 -I/usr/include/harfbuzz
