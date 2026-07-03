@@ -6,7 +6,7 @@
  #include "global.h"
 #endif
 
-#include "gui_base.h"
+#include "__core.h"
 
 // > SUBMODULES
 #include "_font.h"

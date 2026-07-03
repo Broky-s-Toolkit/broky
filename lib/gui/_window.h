@@ -1,7 +1,7 @@
 #pragma once
 
 #ifndef IDE_SYNTAX_HL
- #include "gui_base.h"
+ #include "__core.h"
  #include "_setup.h"
  #include "_controls.h"
 #endif

@@ -1,6 +1,6 @@
 #pragma once
 #ifndef IDE_SYNTAX_HL
- #include "gui_base.h"
+ #include "__core.hh"
  #include "_setup.h"
  #include "_overlay.h"
  #include "_font.h"

@@ -2,7 +2,7 @@
 #ifndef IDE_SYNTAX_HL
  #define STB_TRUETYPE_IMPLEMENTATION
  #include "3rd/stb_truetype.h"
- #include "gui_base.h"
+ #include "__core.h"
 #endif
 
 GUI_FontAtlas GUI_LoadFontAtlasASCII(const char *path, int pixel_size);
