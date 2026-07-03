@@ -1,7 +1,7 @@
 #pragma once
 #ifndef IDE_SYNTAX_HL
  #define STB_TRUETYPE_IMPLEMENTATION
- #include <stb_truetype.h>
+ #include "3rd/stb_truetype.h"
  #include "gui_base.h"
 #endif
 

@@ -7,14 +7,16 @@
 #endif
 
 #include "gui_base.h"
-#include "_font.h"
-#include "_setup.h"
 
 // > SUBMODULES
+#include "_font.h"
+#include "_setup.h"
 #include "_grid.h"
-#include "_window.h"
 #include "_overlay.h"
 #include "_controls.h"
+#include "_window.h"
+
+
 
 // > FUNCTIONS
 //   IMPLEMENTATION

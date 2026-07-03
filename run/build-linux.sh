@@ -5,5 +5,5 @@ rm bin/dbg-linux/run > /dev/null 2>&1
 gcc -Wall -Wextra -Wunused-variable -Wunused-parameter \
     src/main.c \
     -g -ggdb -o bin/dbg-linux/run -std=c99 -pedantic \
-    -I/usr/local/include -Isrc -Isrc/game -Ilib/3rd -Ilib/gui -Ilib/rayext -Ilib/broky \
+    -I/usr/local/include -Isrc -Isrc/game -Ilib \
     -lraylib -lm

@@ -13,11 +13,7 @@ add_executable(broky
 
 target_include_directories(broky PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/game
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib/3rd
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib/gui
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib/rayext
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib/broky
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib
     /usr/local/include
 )
 

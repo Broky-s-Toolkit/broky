@@ -12,6 +12,5 @@
 #include <raylib.h>
 #include <rlgl.h>
 #include <raymath.h>
-#include "rayext.h"
+#include "rayext/rayext.h"
 #include "string.h"
-

@@ -1,7 +1,8 @@
 #pragma once
-#include "_controls.h"
+
 #ifndef IDE_SYNTAX_HL
 #define IMPLEMENT_ALL   1
+#include "gui/gui.h"
 #include "../common.h"
 #endif
 
@@ -54,7 +55,6 @@ void GUI_GameMenu()
 void GUI_FontSettingsMenu()
 {
     GAME_WindowState *win_state = GAME_CTX.win_state;
-    EGUI_ThemeColor colors = GUI_OverlayColors();
 
     GUI_BeginOverlay(true, true);
         GUI_SetFont(EGUI_Font_Default);

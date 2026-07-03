@@ -1,6 +1,6 @@
 #pragma once
 #ifndef IDE_SYNTAX_HL
- #include "gui.h"
+ #include "gui_base.h"
 #endif
 
 

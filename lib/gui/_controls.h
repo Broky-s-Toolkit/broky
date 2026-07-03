@@ -4,7 +4,6 @@
  #include "_setup.h"
  #include "_overlay.h"
  #include "_font.h"
- #include "_window.h"
 #endif
 
 // > SUBMODULE: CONTROLS
@@ -139,7 +138,6 @@ bool GUI_CheckCollisionCursorControlWin(Rectangle shape)
     bool collide        = GUI_CheckCollisionCursorControl(shape, window);
     return collide;
 }
-
 
 Rectangle GUI_ControlShapeCut(Rectangle shape, float border, float scale, bool intersect_window) {
     Rectangle result = AddRect(shape, border * scale, border * scale, -border * scale * 2, -border * scale * 2);
