@@ -1,9 +1,8 @@
 #pragma once
 
 #ifndef IDE_SYNTAX_HL
-#define IMPLEMENT_ALL   1
-#include "gui/gui.h"
-#include "../common.h"
+ #define IMPLEMENT_ALL   1
+ #include "__core.h"
 #endif
 
 //

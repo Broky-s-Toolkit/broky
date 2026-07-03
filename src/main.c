@@ -2,8 +2,6 @@
 #define IMPLEMENT_ALL 1
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "3rd/stb_truetype.h"
-
-
 #include "common.h"
 #include "gui/gui.h"
 #include "game/main.h"
