@@ -1,6 +1,7 @@
 #pragma once
 #ifndef IDE_SYNTAX_HL
  #include "gui_base.h"
+ #include "_font.h"
 #endif
 
 
