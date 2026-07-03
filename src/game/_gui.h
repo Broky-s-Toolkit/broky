@@ -415,7 +415,7 @@ void WIN_Winman(GUI_Window* window)
     if (GUI_Button(GUI_GridNextY(), "Settings", &icons->Setup, window->colors)) {
         int win_id = 5;
         if (win_settings == NULL || win_settings->id == 0) {
-            win_settings = GUI_OpenWindow(win_id, "Settings", EGUI_ThemeColor_Gray, &icons->Face, true, WIN_Settings);
+            win_settings = GUI_OpenWindow(win_id, "Settings", EGUI_ThemeColor_Gray, &icons->Setup, true, WIN_Settings);
         }
         GUI_ForceZindex(win_id);
     }
@@ -423,7 +423,7 @@ void WIN_Winman(GUI_Window* window)
     if (GUI_Button(GUI_GridNextY(), "Font settings", &icons->Setup, window->colors)) {
         int win_id = 7;
         if (win_font_settings == NULL || win_font_settings->id == 0) {
-            win_font_settings = GUI_OpenWindow(win_id, "Font settings", EGUI_ThemeColor_Gray, &icons->Face, true, WIN_FontSettings);
+            win_font_settings = GUI_OpenWindow(win_id, "Font settings", EGUI_ThemeColor_Gray, &icons->Setup, true, WIN_FontSettings);
             win_font_settings->shape.width = 520.0f;
             win_font_settings->shape.height = 420.0f;
         }
