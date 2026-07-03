@@ -59,7 +59,7 @@ void GUI_Check(Rectangle shape, bool *value, const char *on_txt, const char *off
     /*   is_active          : control activated                             */\
     /* Conditions */ \
     bool is_activable       = GUI_CTX.temp->window_current_action == EGUI_WindowAction_None;    \
-    bool is_cursor_over     = GUI_CheckCollisionCursorControlWin(shape);                 \
+    bool is_cursor_over     = is_activable && GUI_CheckCollisionCursorControlWin(shape);        \
     bool is_cursor_active   = is_activable && IsMouseButtonPressed(MOUSE_BUTTON_LEFT);          \
     \
     /* Activation */                                            \
@@ -76,7 +76,7 @@ void GUI_Check(Rectangle shape, bool *value, const char *on_txt, const char *off
     /*   is_focused         : control retains focus state                   */\
     /* Conditions */ \
     bool is_activable       = GUI_CTX.temp->window_current_action == EGUI_WindowAction_None;    \
-    bool is_cursor_over     = GUI_CheckCollisionCursorControlWin(shape);                 \
+    bool is_cursor_over     = is_activable && GUI_CheckCollisionCursorControlWin(shape);        \
     bool is_cursor_active   = is_activable && (IsMouseButtonPressed(MOUSE_BUTTON_LEFT));        \
     \
     /* Gains focus */                                           \
