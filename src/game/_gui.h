@@ -23,7 +23,7 @@ void WIN_Winman(GUI_Window* window);
 //
 // FUNCTIONS
 //
-#
+#ifdef IMPLEMENT_ALL
 
 void GUI_ProgramMenu()
 {
@@ -340,8 +340,7 @@ void WIN_FontSettings(GUI_Window* window)
         }
     }
     GUI_GridForDuplicate();
-    GUI_GridNextX();
-    GUI_Text(GUI_GridNextX(), "combine with scale with decimal values", colors);
+    GUI_Text(GUI_GridNextXn(3), "combine filtering with non-integer scaling", colors);
 
     bool use_atlas = font_setup->atlas_reload_size > 0
         || font_setup->atlas.ready
@@ -509,3 +508,5 @@ void WIN_Winman(GUI_Window* window)
     next = GUI_GridNextY();
     GUI_Image(image, (Rectangle){ next.x, next.y, next.width, 320 });
 }
+
+#endif
