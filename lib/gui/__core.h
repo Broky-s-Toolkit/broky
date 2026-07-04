@@ -230,6 +230,18 @@ typedef struct {
 // > TYPES
 //
 
+typedef struct {
+    int value;
+    const char *label;
+    Texture2D *icon;
+} GUI_MenuItem;
+
+typedef struct {
+    const GUI_MenuItem *elements;
+    int count;
+    // TODO@dc: review int?
+    int *selected_value;
+} GUI_MenuItems;
 
 typedef struct {
     const void      *id_ptr;            // Control Owner. A unique pointer representing the control owner

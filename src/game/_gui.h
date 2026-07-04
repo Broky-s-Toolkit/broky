@@ -55,18 +55,24 @@ void GUI_FontSettingsMenu()
 {
     GAME_WindowState *win_state = GAME_CTX.win_state;
     int selected_font = win_state->editor_font;
+    Rectangle final_shape = { 0 };
     static const GUI_MenuItem font_items[] = {
         { EGUI_Font_Default,   "Default",   NULL },
         { EGUI_Font_GUI,       "GUI",       NULL },
         { EGUI_Font_ShareTech, "ShareTech", NULL },
     };
+    GUI_MenuItems items = {
+        .elements = font_items,
+        .count = (int)(sizeof(font_items) / sizeof(font_items[0])),
+        .selected_value = &selected_font,
+    };
 
     GUI_BeginOverlay(true, true);
-    GUI_SetFont(EGUI_Font_Default);
-    GUI_ButtonMenuContents(-2, -1, 1, EGUI_ThemeColor_Green,
-        font_items, (int)(sizeof(font_items) / sizeof(font_items[0])),
-        &selected_font);
-    win_state->editor_font = (EGUI_Font)selected_font;
+        GUI_SetFont(EGUI_Font_Default);
+        if (GUI_ButtonMenuContents(-2, -1, 1, EGUI_ThemeColor_Green, &items, &final_shape)) {
+            win_state->editor_font = (EGUI_Font)selected_font;
+        }
+    GUI_EndOverlay(final_shape);
 }
 
 void GUI_TopBar()
