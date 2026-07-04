@@ -202,14 +202,18 @@ GUI_FontSetup* GUI_GetFontSetup(EGUI_Font font)
 GUI_MenuItems GUI_GetFontMenuItems(int *selected_value)
 {
     GUI_Icons *icons = GUI_GetIcons();
+    static GUI_MenuItem elements[] = {
+        { EGUI_Font_Default,   "Default",   NULL },
+        { EGUI_Font_GUI,       "GUI",       NULL },
+        { EGUI_Font_ShareTech, "ShareTech", NULL },
+    };
+
+    elements[2].icon = &icons->Dog;
+
     return (GUI_MenuItems) {
         .selected_value = selected_value,
         .count = 3,
-        .elements = (GUI_MenuItem[]) {
-            { EGUI_Font_Default,   "Default",   NULL },
-            { EGUI_Font_GUI,       "GUI",       NULL },
-            { EGUI_Font_ShareTech, "ShareTech", &icons->Dog },
-        },
+        .elements = elements,
     };
 }
 
