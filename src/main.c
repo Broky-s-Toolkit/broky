@@ -5,7 +5,7 @@
 #include "common.h"
 #include "gui/gui.h"
 #include "game/main.h"
-#include "lab.h"
+#include "labs/lab.h"
 
 #define GAME_RES_W          320
 #define GAME_RES_H          240
