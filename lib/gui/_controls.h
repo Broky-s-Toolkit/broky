@@ -33,6 +33,7 @@ void        GUI_Image(Texture2D texture, Rectangle shape);
 void GUI_DrawButton(Rectangle shape, const char *text, Texture2D *icon, EGUI_ControlStatus status, EGUI_ThemeColor colors, EGUI_Font font);
 bool GUI_Button(Rectangle shape, const char* text, Texture2D* icon, EGUI_ThemeColor colors);
 bool GUI_ButtonMenu(Rectangle shape, const char* text_id, Texture2D* icon, EGUI_ThemeColor colors, void (*draw_function)(void));
+bool GUI_ButtonMenuContents(int x, int x_end, int start_row, EGUI_ThemeColor colors, const GUI_MenuItem *items, int item_count, int *selected_value);
 // > TEXT
 void GUI_DrawText(Rectangle shape, const char* text, EGUI_ThemeColor colors, EGUI_Font font);
 void GUI_Text(Rectangle shape, const char* text, EGUI_ThemeColor colors);
@@ -451,6 +452,50 @@ bool GUI_ButtonMenu(
     // Update condition
     is_open = GUI_OverlayOpenedBy(text_id);
     return is_open;
+}
+
+bool GUI_ButtonMenuContents(int x, int x_end, int start_row, EGUI_ThemeColor colors, const GUI_MenuItem *items, int item_count, int *selected_value)
+{
+    Assert(items != NULL);
+    Assert(item_count > 0);
+    Assert(selected_value != NULL);
+
+    int selected_index = 0;
+    for (int i = 0; i < item_count; i++) {
+        if (items[i].value == *selected_value) {
+            selected_index = i;
+            break;
+        }
+    }
+
+    bool changed            = false;
+    int visible_rows        = item_count - 1;
+    int final_row           = start_row + visible_rows - 1;
+    Rectangle final_shape   = GUI_GridBetween(x, start_row, x_end, final_row);
+
+    if (visible_rows <= 0) {
+        GUI_EndOverlay(GUI_GridBetween(x, start_row, x_end, start_row));
+        return false;
+    }
+
+    GUI_DrawShadow(final_shape);
+    if (GUI_OverlayWasJustEnabled() == false) {
+        int draw_row = start_row;
+        for (int item_index = 0; item_index < item_count; item_index++) {
+            if (item_index == selected_index) continue;
+
+            const GUI_MenuItem *item = &items[item_index];
+            Rectangle item_shape = GUI_GridBetween(x, draw_row, x_end, draw_row);
+            if (GUI_Button(item_shape, item->label, item->icon, colors)) {
+                changed = *selected_value != item->value;
+                *selected_value = item->value;
+            }
+            draw_row++;
+        }
+    }
+
+    GUI_EndOverlay(final_shape);
+    return changed;
 }
 // < END BUTTON
 

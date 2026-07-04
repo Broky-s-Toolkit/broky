@@ -54,27 +54,19 @@ void GUI_GameMenu()
 void GUI_FontSettingsMenu()
 {
     GAME_WindowState *win_state = GAME_CTX.win_state;
+    int selected_font = win_state->editor_font;
+    static const GUI_MenuItem font_items[] = {
+        { EGUI_Font_Default,   "Default",   NULL },
+        { EGUI_Font_GUI,       "GUI",       NULL },
+        { EGUI_Font_ShareTech, "ShareTech", NULL },
+    };
 
     GUI_BeginOverlay(true, true);
-        GUI_SetFont(EGUI_Font_Default);
-        Rectangle menu_0        = GUI_GridBetween(-2, 1, -1, 1);
-        Rectangle menu_1        = GUI_GridBetween(-2, 2, -1, 2);
-        Rectangle menu_2        = GUI_GridBetween(-2, 3, -1, 3);
-        Rectangle final_shape   = GUI_GridBetween(-2, 1, -1, 3);
-
-        GUI_DrawShadow(final_shape);
-        if (GUI_OverlayWasJustEnabled() == false) {
-            if (GUI_Button(menu_0, "Default", NULL, win_state->editor_font == EGUI_Font_Default ? EGUI_ThemeColor_Red : EGUI_ThemeColor_Green)) {
-                win_state->editor_font = EGUI_Font_Default;
-            }
-            if (GUI_Button(menu_1, "GUI", NULL, win_state->editor_font == EGUI_Font_GUI ? EGUI_ThemeColor_Red : EGUI_ThemeColor_Green)) {
-                win_state->editor_font = EGUI_Font_GUI;
-            }
-            if (GUI_Button(menu_2, "ShareTech", NULL, win_state->editor_font == EGUI_Font_ShareTech ? EGUI_ThemeColor_Red : EGUI_ThemeColor_Green)) {
-                win_state->editor_font = EGUI_Font_ShareTech;
-            }
-        }
-    GUI_EndOverlay(final_shape);
+    GUI_SetFont(EGUI_Font_Default);
+    GUI_ButtonMenuContents(-2, -1, 1, EGUI_ThemeColor_Green,
+        font_items, (int)(sizeof(font_items) / sizeof(font_items[0])),
+        &selected_font);
+    win_state->editor_font = (EGUI_Font)selected_font;
 }
 
 void GUI_TopBar()
