@@ -486,7 +486,7 @@ bool GUI_ButtonMenuContents(int x, int x_end, int start_row, EGUI_ThemeColor col
 
             const GUI_MenuItem *item = &items->elements[item_index];
             Rectangle item_shape = GUI_GridBetween(x, draw_row, x_end, draw_row);
-            if (GUI_Button(item_shape, item->label, item->icon, colors)) {
+            if (GUI_Button(item_shape, item->label, GUI_GetIconTexture(item->icon), colors)) {
                 changed = *items->selected_value != item->value;
                 *items->selected_value = item->value;
             }

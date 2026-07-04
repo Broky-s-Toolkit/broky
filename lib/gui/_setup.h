@@ -34,6 +34,7 @@ void                GUI_SetThemeColors(EGUI_ThemeColor color);
 GUI_Icons           GUI_LoadIcons(void);
 GUI_IconSetup       GUI_MakeIconSetup(GUI_Icons icons);
 GUI_Icons*          GUI_GetIcons(void);
+Texture2D*          GUI_GetIconTexture(EGUI_Icon icon);
 float               GUI_GetIconWidth(void);
 float               GUI_GetIconWidthForShape(Rectangle shape, float border);
 float               GUI_GetIconSmallWidth(void);
@@ -201,14 +202,11 @@ GUI_FontSetup* GUI_GetFontSetup(EGUI_Font font)
 
 GUI_MenuItems GUI_GetFontMenuItems(int *selected_value)
 {
-    GUI_Icons *icons = GUI_GetIcons();
     static GUI_MenuItem elements[] = {
-        { EGUI_Font_Default,   "Default",   NULL },
-        { EGUI_Font_GUI,       "GUI",       NULL },
-        { EGUI_Font_ShareTech, "ShareTech", NULL },
+        { EGUI_Font_Default,   "Default",   EGUI_Icon_None },
+        { EGUI_Font_GUI,       "GUI",       EGUI_Icon_None },
+        { EGUI_Font_ShareTech, "ShareTech", EGUI_Icon_Dog },
     };
-
-    elements[2].icon = &icons->Dog;
 
     return (GUI_MenuItems) {
         .selected_value = selected_value,
@@ -424,6 +422,27 @@ GUI_IconSetup GUI_MakeIconSetup(GUI_Icons icons)
 GUI_Icons* GUI_GetIcons(void)
 {
     return &GUI_CTX.setup->icons.icons;
+}
+
+Texture2D* GUI_GetIconTexture(EGUI_Icon icon)
+{
+    GUI_Icons *icons = GUI_GetIcons();
+
+    switch (icon) {
+    case EGUI_Icon_New:            return &icons->New;
+    case EGUI_Icon_Open:           return &icons->Open;
+    case EGUI_Icon_Save:           return &icons->Save;
+    case EGUI_Icon_Setup:          return &icons->Setup;
+    case EGUI_Icon_Error:          return &icons->Error;
+    case EGUI_Icon_Face:           return &icons->Face;
+    case EGUI_Icon_Dog:            return &icons->Dog;
+    case EGUI_Icon_Close:          return &icons->Close;
+    case EGUI_Icon_CloseSmall:     return &icons->CloseSmall;
+    case EGUI_Icon_MinimizeSmall:  return &icons->MinimizeSmall;
+    case EGUI_Icon_Layouts:        return &icons->Layouts;
+    case EGUI_Icon_None:
+    default:                       return &icons->None;
+    }
 }
 
 float GUI_GetIconWidth(void)

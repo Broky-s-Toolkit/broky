@@ -275,7 +275,7 @@ void WIN_FontSettings(GUI_Window* window)
 
     GUI_GridForDuplicate();
     GUI_Text(GUI_GridNextX(), "Editing", colors);
-    GUI_ButtonMenu(GUI_GridNextXn(2), item->label, item->icon, colors, GUI_FontSettingsMenu);
+    GUI_ButtonMenu(GUI_GridNextXn(2), item->label, GUI_GetIconTexture(item->icon), colors, GUI_FontSettingsMenu);
     font_target = win_state->editor_font;
     font_setup = &setup->fonts[font_target];
 

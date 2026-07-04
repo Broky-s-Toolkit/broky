@@ -102,6 +102,22 @@ typedef struct {
 } GUI_Theme;
 
 typedef enum {
+    EGUI_Icon_None,
+    EGUI_Icon_New,
+    EGUI_Icon_Open,
+    EGUI_Icon_Save,
+    EGUI_Icon_Setup,
+    EGUI_Icon_Error,
+    EGUI_Icon_Face,
+    EGUI_Icon_Dog,
+    EGUI_Icon_Close,
+    EGUI_Icon_CloseSmall,
+    EGUI_Icon_MinimizeSmall,
+    EGUI_Icon_Layouts,
+    EGUI_Icon_Count
+} EGUI_Icon;
+
+typedef enum {
     EGUI_Font_Default,
     EGUI_Font_GUI,
     EGUI_Font_ShareTech,
@@ -233,7 +249,7 @@ typedef struct {
 typedef struct {
     int value;
     const char *label;
-    Texture2D *icon;
+    EGUI_Icon icon;
 } GUI_MenuItem;
 
 typedef struct {
