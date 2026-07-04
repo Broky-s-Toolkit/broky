@@ -237,10 +237,10 @@ typedef struct {
 } GUI_MenuItem;
 
 typedef struct {
-    const GUI_MenuItem *elements;
-    int count;
     // TODO@dc: review int?
     int *selected_value;
+    int count;
+    const GUI_MenuItem *elements;
 } GUI_MenuItems;
 
 typedef struct {

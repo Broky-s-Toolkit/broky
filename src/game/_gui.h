@@ -56,15 +56,14 @@ void GUI_FontSettingsMenu()
     GAME_WindowState *win_state = GAME_CTX.win_state;
     int selected_font = win_state->editor_font;
     Rectangle final_shape = { 0 };
-    static const GUI_MenuItem font_items[] = {
-        { EGUI_Font_Default,   "Default",   NULL },
-        { EGUI_Font_GUI,       "GUI",       NULL },
-        { EGUI_Font_ShareTech, "ShareTech", NULL },
-    };
     GUI_MenuItems items = {
-        .elements = font_items,
-        .count = (int)(sizeof(font_items) / sizeof(font_items[0])),
         .selected_value = &selected_font,
+        .count = 3,
+        .elements = (GUI_MenuItem[]) {
+            { EGUI_Font_Default,   "Default",   NULL },
+            { EGUI_Font_GUI,       "GUI",       NULL },
+            { EGUI_Font_ShareTech, "ShareTech", NULL },
+        },
     };
 
     GUI_BeginOverlay(true, true);
