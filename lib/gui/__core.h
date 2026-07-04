@@ -243,6 +243,26 @@ typedef struct {
     const GUI_MenuItem *elements;
 } GUI_MenuItems;
 
+const GUI_MenuItem *GUI_MenuItemGetSelected(GUI_MenuItems *items);
+
+#ifdef IMPLEMENT_ALL
+const GUI_MenuItem *GUI_MenuItemGetSelected(GUI_MenuItems *items)
+{
+    Assert(items != NULL);
+    Assert(items->selected_value != NULL);
+    Assert(items->count > 0);
+    Assert(items->elements != NULL);
+
+    for (int i = 0; i < items->count; i++) {
+        if (items->elements[i].value == *items->selected_value) {
+            return &items->elements[i];
+        }
+    }
+
+    return &items->elements[0];
+}
+#endif
+
 typedef struct {
     const void      *id_ptr;            // Control Owner. A unique pointer representing the control owner
     GUI_GridTemp    grid;               // Grid state when the overlay draw was queued

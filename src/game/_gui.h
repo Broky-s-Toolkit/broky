@@ -56,15 +56,7 @@ void GUI_FontSettingsMenu()
     GAME_WindowState *win_state = GAME_CTX.win_state;
     int selected_font = win_state->editor_font;
     Rectangle final_shape = { 0 };
-    GUI_MenuItems items = {
-        .selected_value = &selected_font,
-        .count = 3,
-        .elements = (GUI_MenuItem[]) {
-            { EGUI_Font_Default,   "Default",   NULL },
-            { EGUI_Font_GUI,       "GUI",       NULL },
-            { EGUI_Font_ShareTech, "ShareTech", NULL },
-        },
-    };
+    GUI_MenuItems items = GUI_GetFontMenuItems(&selected_font);
 
     GUI_BeginOverlay(true, true);
         GUI_SetFont(EGUI_Font_Default);
@@ -274,6 +266,8 @@ void WIN_FontSettings(GUI_Window* window)
     GUI_Setup *setup            = GUI_GetSetup();
     EGUI_ThemeColor colors      = window->colors;
     EGUI_Font font_target       = win_state->editor_font;
+    GUI_MenuItems font_items    = GUI_GetFontMenuItems((int *)&font_target);
+    const GUI_MenuItem *item    = GUI_MenuItemGetSelected(&font_items);
     GUI_FontSetup *font_setup   = &setup->fonts[font_target];
 
     GUI_SetFont(EGUI_Font_Default);
@@ -281,7 +275,7 @@ void WIN_FontSettings(GUI_Window* window)
 
     GUI_GridForDuplicate();
     GUI_Text(GUI_GridNextX(), "Editing", colors);
-    GUI_ButtonMenu(GUI_GridNextXn(2), GAME_GetFontLabel(font_target), NULL, colors, GUI_FontSettingsMenu);
+    GUI_ButtonMenu(GUI_GridNextXn(2), item->label, item->icon, colors, GUI_FontSettingsMenu);
     font_target = win_state->editor_font;
     font_setup = &setup->fonts[font_target];
 

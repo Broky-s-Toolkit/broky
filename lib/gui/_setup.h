@@ -15,6 +15,7 @@ GUI_CursorSetup*    GUI_GetCursorSetup(void);
 GUI_FontSetup       GUI_LoadFontSetupDefault(EGUI_Font font);
 void                GUI_ReloadFontSetupAsset(EGUI_Font font);
 GUI_FontSetup*      GUI_GetFontSetup(EGUI_Font font);
+GUI_MenuItems       GUI_GetFontMenuItems(int *selected_value);
 const char*         GUI_GetTextureFilterLabel(int texture_filter);
 Font                GUI_GetFontAsset(EGUI_Font font);
 EGUI_Font           GUI_GetFont(void);
@@ -196,6 +197,20 @@ GUI_FontSetup* GUI_GetFontSetup(EGUI_Font font)
 {
     Assert(font >= 0 && font < EGUI_Font_Count);
     return &GUI_CTX.setup->fonts[font];
+}
+
+GUI_MenuItems GUI_GetFontMenuItems(int *selected_value)
+{
+    GUI_Icons *icons = GUI_GetIcons();
+    return (GUI_MenuItems) {
+        .selected_value = selected_value,
+        .count = 3,
+        .elements = (GUI_MenuItem[]) {
+            { EGUI_Font_Default,   "Default",   NULL },
+            { EGUI_Font_GUI,       "GUI",       NULL },
+            { EGUI_Font_ShareTech, "ShareTech", &icons->Dog },
+        },
+    };
 }
 
 Font GUI_GetFontAsset(EGUI_Font font)
