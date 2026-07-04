@@ -1,6 +1,6 @@
 #ifndef NON_EDITOR_BUILD
  #define NON_EDITOR_BUILD 0
- #include "common.h"
+ #include "../common.h"
 #endif
 
 #ifndef WALLPAPER_LOGICAL_W
