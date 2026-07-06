@@ -421,6 +421,7 @@ bool GUI_Button(
     return is_active;
 }
 
+// TODO@dc: review const char* text_id usage. Seems dirty see WIN_FontSettings.
 bool GUI_ButtonMenu(
     Rectangle shape, const char* text_id, Texture2D* icon,
     EGUI_ThemeColor colors, void (*draw_function)(void))

@@ -16,7 +16,9 @@ GUI_FontSetup       GUI_LoadFontSetupDefault(EGUI_Font font);
 void                GUI_ReloadFontSetupAsset(EGUI_Font font);
 GUI_FontSetup*      GUI_GetFontSetup(EGUI_Font font);
 GUI_MenuItems       GUI_GetFontMenuItems(int *selected_value);
+GUI_MenuItems       GUI_GetTextureFilterMenuItems(int *selected_value);
 const char*         GUI_GetTextureFilterLabel(int texture_filter);
+void                GUI_ApplyFontTextureFilter(EGUI_Font font);
 Font                GUI_GetFontAsset(EGUI_Font font);
 EGUI_Font           GUI_GetFont(void);
 void                GUI_SetFont(EGUI_Font font);
@@ -213,6 +215,34 @@ GUI_MenuItems GUI_GetFontMenuItems(int *selected_value)
         .count = 3,
         .elements = elements,
     };
+}
+
+GUI_MenuItems GUI_GetTextureFilterMenuItems(int *selected_value)
+{
+    static GUI_MenuItem elements[] = {
+        { TEXTURE_FILTER_POINT,      "point",      EGUI_Icon_Null },
+        { TEXTURE_FILTER_BILINEAR,   "bilinear",   EGUI_Icon_Null },
+        { TEXTURE_FILTER_TRILINEAR,  "trilinear",  EGUI_Icon_Null },
+    };
+
+    return (GUI_MenuItems) {
+        .selected_value = selected_value,
+        .count = 3,
+        .elements = elements,
+    };
+}
+
+void GUI_ApplyFontTextureFilter(EGUI_Font font)
+{
+    GUI_FontSetup *font_setup = GUI_GetFontSetup(font);
+
+    if (font_setup->atlas.texture.id != 0) {
+        SetTextureFilter(font_setup->atlas.texture, font_setup->texture_filter);
+    }
+
+    if (font_setup->custom.texture.id != 0) {
+        SetTextureFilter(font_setup->custom.texture, font_setup->texture_filter);
+    }
 }
 
 Font GUI_GetFontAsset(EGUI_Font font)
@@ -429,6 +459,7 @@ Texture2D* GUI_GetIconTexture(EGUI_Icon icon)
     GUI_Icons *icons = GUI_GetIcons();
 
     switch (icon) {
+    case EGUI_Icon_Null:           return NULL;
     case EGUI_Icon_New:            return &icons->New;
     case EGUI_Icon_Open:           return &icons->Open;
     case EGUI_Icon_Save:           return &icons->Save;

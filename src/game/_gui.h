@@ -11,6 +11,7 @@
 void GUI_ProgramMenu();
 void GUI_GameMenu();
 void GUI_FontSettingsMenu();
+void GUI_FontFilterMenu();
 void GUI_TopBar();
 void WIN_Window(GUI_Window* window);
 void WIN_Layouts(GUI_Window* window);
@@ -62,6 +63,25 @@ void GUI_FontSettingsMenu()
         GUI_SetFont(EGUI_Font_Default);
         if (GUI_ButtonMenuContents(-2, -1, 1, EGUI_ThemeColor_Green, &items, &final_shape)) {
             win_state->editor_font = (EGUI_Font)selected_font;
+        }
+    GUI_EndOverlay(final_shape);
+}
+
+void GUI_FontFilterMenu()
+{
+    GAME_WindowState *win_state     = GAME_CTX.win_state;
+    GUI_Setup *setup                = GUI_GetSetup();
+    EGUI_Font font_target           = win_state->editor_font;
+    GUI_FontSetup *font_setup       = &setup->fonts[font_target];
+    int selected_filter             = font_setup->texture_filter;
+    Rectangle final_shape           = { 0 };
+    GUI_MenuItems items             = GUI_GetTextureFilterMenuItems(&selected_filter);
+
+    GUI_BeginOverlay(true, true);
+        GUI_SetFont(EGUI_Font_Default);
+        if (GUI_ButtonMenuContents(-2, -1, 1, EGUI_ThemeColor_Green, &items, &final_shape)) {
+            font_setup->texture_filter = selected_filter;
+            GUI_ApplyFontTextureFilter(font_target);
         }
     GUI_EndOverlay(final_shape);
 }
@@ -316,19 +336,11 @@ void WIN_FontSettings(GUI_Window* window)
 
     GUI_GridForDuplicate();
     GUI_Text(GUI_GridNextX(), "filter", colors);
-    if (GUI_Button(GUI_GridNextXn(2), GUI_GetTextureFilterLabel(font_setup->texture_filter), NULL, colors)) {
-        switch (font_setup->texture_filter) {
-        case TEXTURE_FILTER_POINT:
-            font_setup->texture_filter = TEXTURE_FILTER_BILINEAR;
-            break;
-        case TEXTURE_FILTER_BILINEAR:
-            font_setup->texture_filter = TEXTURE_FILTER_TRILINEAR;
-            break;
-        case TEXTURE_FILTER_TRILINEAR:
-        default:
-            font_setup->texture_filter = TEXTURE_FILTER_POINT;
-            break;
-        }
+    {
+        int selected_filter = font_setup->texture_filter;
+        GUI_MenuItems filter_items = GUI_GetTextureFilterMenuItems(&selected_filter);
+        const GUI_MenuItem *filter_item = GUI_MenuItemGetSelected(&filter_items);
+        GUI_ButtonMenu(GUI_GridNextXn(2), filter_item->label, GUI_GetIconTexture(filter_item->icon), colors, GUI_FontFilterMenu);
     }
     GUI_GridForDuplicate();
     GUI_Text(GUI_GridNextXn(3), "combine filtering with non-integer scaling", colors);

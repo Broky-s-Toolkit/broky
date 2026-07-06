@@ -102,6 +102,7 @@ typedef struct {
 } GUI_Theme;
 
 typedef enum {
+    EGUI_Icon_Null = 0,
     EGUI_Icon_None,
     EGUI_Icon_New,
     EGUI_Icon_Open,
