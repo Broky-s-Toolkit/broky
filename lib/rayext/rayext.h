@@ -12,6 +12,8 @@
         } \
     } while (0)
 
+#define StaticAssert(cond, msg) _Static_assert((cond), msg)
+
 const char* BuildTimeFormatted()
 {
     static char buffer[32];

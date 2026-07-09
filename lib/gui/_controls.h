@@ -32,7 +32,7 @@ void        GUI_Image(Texture2D texture, Rectangle shape);
 // > BUTTON
 void GUI_DrawButton(Rectangle shape, const char *text, Texture2D *icon, EGUI_ControlStatus status, EGUI_ThemeColor colors, EGUI_Font font);
 bool GUI_Button(Rectangle shape, const char* text, Texture2D* icon, EGUI_ThemeColor colors);
-bool GUI_ButtonMenu(Rectangle shape, const char* text_id, Texture2D* icon, EGUI_ThemeColor colors, void (*draw_function)(void));
+bool GUI_ButtonMenu(Rectangle shape, const void* owner_id, const char* text, Texture2D* icon, EGUI_ThemeColor colors, void (*draw_function)(void));
 bool GUI_ButtonMenuContents(int x, int x_end, int start_row, EGUI_ThemeColor colors, GUI_MenuItems *items, Rectangle *final_shape);
 // > TEXT
 void GUI_DrawText(Rectangle shape, const char* text, EGUI_ThemeColor colors, EGUI_Font font);
@@ -421,24 +421,23 @@ bool GUI_Button(
     return is_active;
 }
 
-// TODO@dc: review const char* text_id usage. Seems dirty see WIN_FontSettings.
 bool GUI_ButtonMenu(
-    Rectangle shape, const char* text_id, Texture2D* icon,
+    Rectangle shape, const void* owner_id, const char* text, Texture2D* icon,
     EGUI_ThemeColor colors, void (*draw_function)(void))
 {
     bool scrolled           = GetMouseWheelMove() != 0;
-    bool is_open            = GUI_OverlayOpenedBy(text_id);
-    bool just_interacted    = GUI_Button(shape, text_id, icon, colors);
+    bool is_open            = GUI_OverlayOpenedBy(owner_id);
+    bool just_interacted    = GUI_Button(shape, text, icon, colors);
     if (just_interacted) {
         if (is_open == false) {
-            GUI_OverlayOpenFor(text_id);
+            GUI_OverlayOpenFor(owner_id);
         } else {
             GUI_OverlayClose();
         }
     }
 
     // Update condition
-    is_open = GUI_OverlayOpenedBy(text_id);
+    is_open = GUI_OverlayOpenedBy(owner_id);
 
     // Update
     if (is_open) {
@@ -451,7 +450,7 @@ bool GUI_ButtonMenu(
     }
 
     // Update condition
-    is_open = GUI_OverlayOpenedBy(text_id);
+    is_open = GUI_OverlayOpenedBy(owner_id);
     return is_open;
 }
 

@@ -91,12 +91,15 @@ void GUI_TopBar()
     GUI_Icons *icons    = GUI_GetIcons();
     Vector2 start       = RectPosition(GUI_GridAt(0,0));
     const int BUTTONS   = 4;
+    static const int project_menu_owner = 0;
+    static const int game_menu_owner = 0;
+    static const int other_menu_owner = 0;
     GUI_SetThemeColors(EGUI_ThemeColor_Red);
     GUI_SetFont(EGUI_Font_GUI);
     GUI_GridForCols(BUTTONS, GUI_CalcDefaultHeightScaled(GUI_GetFont()));
-    GUI_ButtonMenu(GUI_GridNextX(), "Project",     &icons->None,  EGUI_ThemeColor_Red,          GUI_ProgramMenu);
-    GUI_ButtonMenu(GUI_GridNextX(), "Game",        &icons->Dog,   EGUI_ThemeColor_Abstractica,  GUI_GameMenu);
-    GUI_ButtonMenu(GUI_GridNextX(), "Other",       &icons->Dog,   EGUI_ThemeColor_Gray,         GUI_GameMenu);
+    GUI_ButtonMenu(GUI_GridNextX(), &project_menu_owner, "Project", &icons->None, EGUI_ThemeColor_Red, GUI_ProgramMenu);
+    GUI_ButtonMenu(GUI_GridNextX(), &game_menu_owner, "Game", &icons->Dog, EGUI_ThemeColor_Abstractica, GUI_GameMenu);
+    GUI_ButtonMenu(GUI_GridNextX(), &other_menu_owner, "Other", &icons->Dog, EGUI_ThemeColor_Gray, GUI_GameMenu);
 
     GUI_Face(start, GUI_GridHeightOrDefault());
     GUI_DrawOverlay();
@@ -129,6 +132,7 @@ void WIN_Window(GUI_Window* window)
     // GUI_WindowUpdateShapeForContent(window);
 
     GUI_Icons *icons            = GUI_GetIcons();
+    static const int game_menu_2_owner = 0;
     // Keep or modify colors
     EGUI_ThemeColor colors      = window->colors;
     // Set your font
@@ -139,7 +143,7 @@ void WIN_Window(GUI_Window* window)
     GUI_GridForCols(3, GUI_CalcDefaultHeightScaled(GUI_GetFont()));
 
     GUI_GridNextX();
-    GUI_ButtonMenu(GUI_GridNextX(), "Game 2",    &icons->Dog,    EGUI_ThemeColor_Abstractica, GUI_GameMenu);
+    GUI_ButtonMenu(GUI_GridNextX(), &game_menu_2_owner, "Game 2", &icons->Dog, EGUI_ThemeColor_Abstractica, GUI_GameMenu);
 
     GUI_GridForDuplicate();
     // 1st input (textbox)
@@ -295,7 +299,7 @@ void WIN_FontSettings(GUI_Window* window)
 
     GUI_GridForDuplicate();
     GUI_Text(GUI_GridNextX(), "Editing", colors);
-    GUI_ButtonMenu(GUI_GridNextXn(2), item->label, GUI_GetIconTexture(item->icon), colors, GUI_FontSettingsMenu);
+    GUI_ButtonMenu(GUI_GridNextXn(2), &win_state->editor_font, item->label, GUI_GetIconTexture(item->icon), colors, GUI_FontSettingsMenu);
     font_target = win_state->editor_font;
     font_setup = &setup->fonts[font_target];
 
@@ -340,7 +344,7 @@ void WIN_FontSettings(GUI_Window* window)
         int selected_filter = font_setup->texture_filter;
         GUI_MenuItems filter_items = GUI_GetTextureFilterMenuItems(&selected_filter);
         const GUI_MenuItem *filter_item = GUI_MenuItemGetSelected(&filter_items);
-        GUI_ButtonMenu(GUI_GridNextXn(2), filter_item->label, GUI_GetIconTexture(filter_item->icon), colors, GUI_FontFilterMenu);
+        GUI_ButtonMenu(GUI_GridNextXn(2), &font_setup->texture_filter, filter_item->label, GUI_GetIconTexture(filter_item->icon), colors, GUI_FontFilterMenu);
     }
     GUI_GridForDuplicate();
     GUI_Text(GUI_GridNextXn(3), "combine filtering with non-integer scaling", colors);

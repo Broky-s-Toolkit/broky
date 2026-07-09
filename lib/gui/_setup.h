@@ -50,7 +50,7 @@ GUI_Setup           GUI_LoadSetupDefault(void);
 GUI_CursorSetup GUI_LoadCursorSetupForType(EGUI_Cursor cursor)
 {
     GUI_CursorSetup setup = { 0 };
-    _Static_assert(EGUI_Cursor_Count  == 5,  "Update cursors here!");
+    StaticAssert(EGUI_Cursor_Count  == 5,  "Update cursors here!");
 
     switch (cursor)
     {
@@ -132,7 +132,7 @@ const char* GUI_GetTextureFilterLabel(int texture_filter)
 
 GUI_FontSetup GUI_LoadFontSetupDefault(EGUI_Font font)
 {
-    _Static_assert(EGUI_Font_Count == 3,  "Update fonts here");
+    StaticAssert(EGUI_Font_Count == 3,  "Update fonts here");
 
     switch (font) {
     case EGUI_Font_GUI: {
@@ -318,7 +318,7 @@ float GUI_CalcDefaultHeightScaled(EGUI_Font font)
 // > THEME
 GUI_ThemeColors GUI_LoadThemeColorsDefault(EGUI_ThemeColor color)
 {
-    _Static_assert(EGUI_ThemeColor_Count == 4, "Update theme colors here");
+    StaticAssert(EGUI_ThemeColor_Count == 4, "Update theme colors here");
 
     switch (color) {
     case EGUI_ThemeColor_Red:
