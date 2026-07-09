@@ -127,9 +127,9 @@ void GUI_EndOverlay(Rectangle final_shape)
         GUI_OverlayClose();
     } else {
         GUI_OverlaySetFinalShape(final_shape);
-        if (DEV_DEBUG_GUI_OVERLAY) {
+        #if DEV_DEBUG_GUI_OVERLAY
             DrawDebugRect(final_shape, RED);
-        }
+        #endif
     }
     // End drawing
     GUI_CTX.temp->overlay.is_drawing = false;
