@@ -193,14 +193,72 @@ typedef struct {
 // > TYPES
 //   SUBMODULE: CONTROLS
 typedef struct {
-    Rectangle       shape;
     EGUI_ThemeColor colors;
+    EGUI_Font       font;
+} GUI_Params;
+
+typedef struct {
+    Rectangle       shape;
+    GUI_Params      opt;
 } GUI_Box;
 
 typedef struct {
     Vector2         position;
     float           height;
 } GUI_Pin;
+
+GUI_Box             GUI_MakeBox(Rectangle shape);
+GUI_Box             GUI_MakeBoxColor(Rectangle shape, EGUI_ThemeColor color);
+GUI_Box             GUI_MakeBoxEx(Rectangle shape, GUI_Params opt);
+GUI_Pin             GUI_MakePin(Vector2 position, float height);
+
+// FORWARD DECLARATIONS
+EGUI_Font           GUI_GetFont(void);
+GUI_ThemeColors     GUI_GetThemeColors(EGUI_ThemeColor color);
+
+#ifdef IMPLEMENT_ALL
+GUI_Box GUI_MakeBox(Rectangle shape)
+{
+    GUI_Box box = {
+        .shape      = shape,
+        .opt        = (GUI_Params) {
+            .font   = GUI_GetFont(),
+            .colors = GUI_GetThemeColors(EGUI_ThemeColor_Gray)
+        }
+    };
+    return box;
+}
+
+GUI_Box GUI_MakeBoxColor(Rectangle shape, EGUI_ThemeColor color)
+{
+    GUI_Box box = {
+        .shape      = shape,
+        .opt        = (GUI_Params) {
+            .font   = GUI_GetFont(),
+            .colors = GUI_GetThemeColors(color)
+        }
+    };
+    return box;
+}
+
+GUI_Box GUI_MakeBoxEx(Rectangle shape, GUI_Params opt)
+{
+    GUI_Box box = {
+        .shape      = shape,
+        .opt        = opt
+    };
+    return box;
+}
+
+GUI_Pin GUI_MakePin(Vector2 position, float height)
+{
+    GUI_Pin pin = {
+        .position   = position,
+        .height     = height
+    };
+    return pin;
+}
+#endif
 // < END SUBMODULE: CONTROLS
 
 // > TYPES
@@ -274,8 +332,6 @@ typedef struct {
 } GUI_MenuItems;
 
 const GUI_MenuItem *GUI_MenuItemGetSelected(GUI_MenuItems *items);
-GUI_Box             GUI_MakeBox(Rectangle shape, EGUI_ThemeColor colors);
-GUI_Pin             GUI_MakePin(Vector2 position, float height);
 
 #ifdef IMPLEMENT_ALL
 const GUI_MenuItem *GUI_MenuItemGetSelected(GUI_MenuItems *items)
@@ -292,24 +348,6 @@ const GUI_MenuItem *GUI_MenuItemGetSelected(GUI_MenuItems *items)
     }
 
     return &items->elements[0];
-}
-
-GUI_Box GUI_MakeBox(Rectangle shape, EGUI_ThemeColor colors)
-{
-    GUI_Box box = {
-        .shape      = shape,
-        .colors     = colors
-    };
-    return box;
-}
-
-GUI_Pin GUI_MakePin(Vector2 position, float height)
-{
-    GUI_Pin pin = {
-        .position   = position,
-        .height     = height
-    };
-    return pin;
 }
 #endif
 
