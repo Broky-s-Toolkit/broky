@@ -32,9 +32,9 @@ void GUI_ProgramMenu()
     GUI_Icons *icons        = GUI_GetIcons();
     EGUI_ThemeColor colors  = GUI_OverlayColors();
     GUI_BeginOverlay(true, true);
-        GUI_Button(GUI_GridAt(x,1),       "New",          &icons->New,    colors);
-        GUI_Button(GUI_GridAt(x,2),       "Open",         &icons->Open,   colors);
-        if (GUI_Button(GUI_GridAt(x,3),   "Quit",         &icons->New,    colors))
+        GUI_Button(GUI_MakeBox(GUI_GridAt(x,1), colors), "New", &icons->New);
+        GUI_Button(GUI_MakeBox(GUI_GridAt(x,2), colors), "Open", &icons->Open);
+        if (GUI_Button(GUI_MakeBox(GUI_GridAt(x,3), colors), "Quit", &icons->New))
             exit(0);
     GUI_EndOverlay(GUI_GridBetween(x, 1, x, 3));
 }
@@ -45,10 +45,10 @@ void GUI_GameMenu()
     GAME_Actions *actions   = &GAME_CTX.temp->player_actions;
     EGUI_ThemeColor colors  = GUI_OverlayColors();
     GUI_BeginOverlay(true, true);
-        GUI_Button(GUI_GridAt(-1, 0), "Game [X]", &icons->Dog, colors);
-        actions->reset_characters    = GUI_Button(GUI_GridAt(-1,1), "Reset",    &icons->New,    colors);
-        actions->add_character       = GUI_Button(GUI_GridAt(-1,2), "Add",      &icons->Open,   colors);
-        actions->toggle_character    = GUI_Button(GUI_GridAt(-1,3), "Change",   &icons->Error,  colors);
+        GUI_Button(GUI_MakeBox(GUI_GridAt(-1, 0), colors), "Game [X]", &icons->Dog);
+        actions->reset_characters    = GUI_Button(GUI_MakeBox(GUI_GridAt(-1,1), colors), "Reset", &icons->New);
+        actions->add_character       = GUI_Button(GUI_MakeBox(GUI_GridAt(-1,2), colors), "Add", &icons->Open);
+        actions->toggle_character    = GUI_Button(GUI_MakeBox(GUI_GridAt(-1,3), colors), "Change", &icons->Error);
     GUI_EndOverlay(GUI_GridBetween(-1, 1, -1, 3));
 }
 
@@ -97,11 +97,11 @@ void GUI_TopBar()
     GUI_SetThemeColors(EGUI_ThemeColor_Red);
     GUI_SetFont(EGUI_Font_GUI);
     GUI_GridForCols(BUTTONS, GUI_CalcDefaultHeightScaled(GUI_GetFont()));
-    GUI_ButtonMenu(GUI_GridNextX(), &project_menu_owner, "Project", &icons->None, EGUI_ThemeColor_Red, GUI_ProgramMenu);
-    GUI_ButtonMenu(GUI_GridNextX(), &game_menu_owner, "Game", &icons->Dog, EGUI_ThemeColor_Abstractica, GUI_GameMenu);
-    GUI_ButtonMenu(GUI_GridNextX(), &other_menu_owner, "Other", &icons->Dog, EGUI_ThemeColor_Gray, GUI_GameMenu);
+    GUI_ButtonMenu(GUI_MakeBox(GUI_GridNextX(), EGUI_ThemeColor_Red), &project_menu_owner, "Project", &icons->None, GUI_ProgramMenu);
+    GUI_ButtonMenu(GUI_MakeBox(GUI_GridNextX(), EGUI_ThemeColor_Abstractica), &game_menu_owner, "Game", &icons->Dog, GUI_GameMenu);
+    GUI_ButtonMenu(GUI_MakeBox(GUI_GridNextX(), EGUI_ThemeColor_Gray), &other_menu_owner, "Other", &icons->Dog, GUI_GameMenu);
 
-    GUI_Face(start, GUI_GridHeightOrDefault());
+    GUI_Face(GUI_MakePin(start, GUI_GridHeightOrDefault()));
     GUI_DrawOverlay();
 }
 
@@ -143,23 +143,23 @@ void WIN_Window(GUI_Window* window)
     GUI_GridForCols(3, GUI_CalcDefaultHeightScaled(GUI_GetFont()));
 
     GUI_GridNextX();
-    GUI_ButtonMenu(GUI_GridNextX(), &game_menu_2_owner, "Game 2", &icons->Dog, EGUI_ThemeColor_Abstractica, GUI_GameMenu);
+    GUI_ButtonMenu(GUI_MakeBox(GUI_GridNextX(), EGUI_ThemeColor_Abstractica), &game_menu_2_owner, "Game 2", &icons->Dog, GUI_GameMenu);
 
     GUI_GridForDuplicate();
     // 1st input (textbox)
-    GUI_Text(GUI_GridNextX(), "Text", colors);
-    GUI_Input(GUI_GridNextXn(2), win_state->input_contents, win_state->input_contents, (int)sizeof(win_state->input_contents), EGUI_Input_Text, colors);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "Text");
+    GUI_Input(GUI_MakeBox(GUI_GridNextXn(2), colors), win_state->input_contents, win_state->input_contents, (int)sizeof(win_state->input_contents), EGUI_Input_Text);
 
     // 2nd input for integer
     // TODO@dc: add min, max and parsing
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "Int", colors);
-    GUI_Input(GUI_GridNextXn(2), win_state->input_int_contents, win_state->input_int_contents, (int)sizeof(win_state->input_int_contents), EGUI_Input_Int, colors);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "Int");
+    GUI_Input(GUI_MakeBox(GUI_GridNextXn(2), colors), win_state->input_int_contents, win_state->input_int_contents, (int)sizeof(win_state->input_int_contents), EGUI_Input_Int);
 
     // 3rd input for float
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "Float", colors);
-    GUI_Input(GUI_GridNextXn(2), win_state->input_float_contents, win_state->input_float_contents, (int)sizeof(win_state->input_float_contents), EGUI_Input_Float, colors);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "Float");
+    GUI_Input(GUI_MakeBox(GUI_GridNextXn(2), colors), win_state->input_float_contents, win_state->input_float_contents, (int)sizeof(win_state->input_float_contents), EGUI_Input_Float);
 }
 
 void WIN_Layouts(GUI_Window* window)
@@ -172,7 +172,7 @@ void WIN_Layouts(GUI_Window* window)
 
     // First block
     GUI_GridForXY(window_workspace.width, default_height, 0);
-    GUI_Text(GUI_GridNextY(), "Some sample layouts for imKairos", EGUI_ThemeColor_Gray);
+    GUI_Text(GUI_MakeBox(GUI_GridNextY(), EGUI_ThemeColor_Gray), "Some sample layouts for imKairos");
 
     float color_alpha = 0.9f;
     GUI_BeginControlScissor();
@@ -220,40 +220,40 @@ void WIN_CharacterDebug(GUI_Window* window)
     GUI_GridForCols(2, GUI_CalcDefaultHeightScaled(GUI_GetFont()));
 
     // Shape
-    GUI_Text(GUI_GridNextX(), "shape.x", colors);
-    GUI_Text(GUI_GridNextX(), TextFormat("%.2f", ch->shape.x), colors);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "shape.x");
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), TextFormat("%.2f", ch->shape.x));
 
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "shape.y", colors);
-    GUI_Text(GUI_GridNextX(), TextFormat("%.2f", ch->shape.y), colors);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "shape.y");
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), TextFormat("%.2f", ch->shape.y));
 
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "shape.w", colors);
-    GUI_Text(GUI_GridNextX(), TextFormat("%.2f", ch->shape.width), colors);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "shape.w");
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), TextFormat("%.2f", ch->shape.width));
 
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "shape.h", colors);
-    GUI_Text(GUI_GridNextX(), TextFormat("%.2f", ch->shape.height), colors);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "shape.h");
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), TextFormat("%.2f", ch->shape.height));
 
     // Color (RGB)
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "color", colors);
-    GUI_Text(GUI_GridNextX(), TextFormat("r:%d g:%d b:%d a:%d",
-        ch->color.r, ch->color.g, ch->color.b, ch->color.a), colors);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "color");
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), TextFormat("r:%d g:%d b:%d a:%d",
+        ch->color.r, ch->color.g, ch->color.b, ch->color.a));
 
     // Movement
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "movement.x", colors);
-    GUI_Text(GUI_GridNextX(), TextFormat("%.3f", ch->movement.x), colors);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "movement.x");
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), TextFormat("%.3f", ch->movement.x));
 
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "movement.y", colors);
-    GUI_Text(GUI_GridNextX(), TextFormat("%.3f", ch->movement.y), colors);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "movement.y");
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), TextFormat("%.3f", ch->movement.y));
 
     // Animation time
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "anim_time", colors);
-    GUI_Text(GUI_GridNextX(), TextFormat("%.3f", ch->anim_time), colors);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "anim_time");
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), TextFormat("%.3f", ch->anim_time));
 }
 
 // Define your draw window
@@ -266,20 +266,20 @@ void WIN_Settings(GUI_Window* window)
 
     GUI_SetFont(font);
     GUI_GridForCols(3, GUI_CalcDefaultHeightScaled(GUI_GetFont()));
-    GUI_Text(GUI_GridNextX(), "Scale", colors);
-    GUI_Float(GUI_GridNextXn(2), &state->scale, colors, 0.5f, 6.0f);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "Scale");
+    GUI_Float(GUI_MakeBox(GUI_GridNextXn(2), colors), &state->scale, 0.5f, 6.0f);
 
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "Scale 2", colors);
-    GUI_Float(GUI_GridNextXn(2), &state->scale, colors, 0.5f, 6.0f);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "Scale 2");
+    GUI_Float(GUI_MakeBox(GUI_GridNextXn(2), colors), &state->scale, 0.5f, 6.0f);
 
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "Wallpaper", colors);
-    GUI_Check(GUI_GridNextXn(2), &win_state->checkbox_value, "ON", "OFF", EGUI_ThemeColor_Red);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "Wallpaper");
+    GUI_Check(GUI_MakeBox(GUI_GridNextXn(2), EGUI_ThemeColor_Red), &win_state->checkbox_value, "ON", "OFF");
 
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "Font", colors);
-    if (GUI_Button(GUI_GridNextXn(2), GAME_GetFontLabel(win_state->demo_font), NULL, colors)) {
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "Font");
+    if (GUI_Button(GUI_MakeBox(GUI_GridNextXn(2), colors), GAME_GetFontLabel(win_state->demo_font), NULL)) {
         win_state->demo_font = (EGUI_Font)((win_state->demo_font + 1) % EGUI_Font_Count);
     }
 }
@@ -298,93 +298,92 @@ void WIN_FontSettings(GUI_Window* window)
     GUI_GridForCols(3, GUI_CalcDefaultHeightScaled(GUI_GetFont()));
 
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "Editing", colors);
-    GUI_ButtonMenu(GUI_GridNextXn(2), &win_state->editor_font, item->label, GUI_GetIconTexture(item->icon), colors, GUI_FontSettingsMenu);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "Editing");
+    GUI_ButtonMenu(GUI_MakeBox(GUI_GridNextXn(2), colors), &win_state->editor_font, item->label, GUI_GetIconTexture(item->icon), GUI_FontSettingsMenu);
     font_target = win_state->editor_font;
     font_setup = &setup->fonts[font_target];
 
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "default_h", colors);
-    GUI_Float(GUI_GridNextXn(2), &font_setup->default_height, colors, 8.0f, 128.0f);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "default_h");
+    GUI_Float(GUI_MakeBox(GUI_GridNextXn(2), colors), &font_setup->default_height, 8.0f, 128.0f);
 
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "border", colors);
-    GUI_Float(GUI_GridNextXn(2), &font_setup->border, colors, 0.0f, 16.0f);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "border");
+    GUI_Float(GUI_MakeBox(GUI_GridNextXn(2), colors), &font_setup->border, 0.0f, 16.0f);
 
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "scale", colors);
-    GUI_Float(GUI_GridNextXn(2), &font_setup->scale, colors, 0.1f, 8.0f);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "scale");
+    GUI_Float(GUI_MakeBox(GUI_GridNextXn(2), colors), &font_setup->scale, 0.1f, 8.0f);
 
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "spacing", colors);
-    GUI_Float(GUI_GridNextXn(2), &font_setup->spacing, colors, -8.0f, 32.0f);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "spacing");
+    GUI_Float(GUI_MakeBox(GUI_GridNextXn(2), colors), &font_setup->spacing, -8.0f, 32.0f);
 
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "delta.x", colors);
-    GUI_Float(GUI_GridNextX(), &font_setup->delta.x, colors, -64.0f, 64.0f);
-    GUI_Float(GUI_GridNextX(), &font_setup->delta.y, colors, -64.0f, 64.0f);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "delta.x");
+    GUI_Float(GUI_MakeBox(GUI_GridNextX(), colors), &font_setup->delta.x, -64.0f, 64.0f);
+    GUI_Float(GUI_MakeBox(GUI_GridNextX(), colors), &font_setup->delta.y, -64.0f, 64.0f);
 
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "blink size", colors);
-    GUI_Float(GUI_GridNextX(), &font_setup->blink_size.x, colors, 0.0f, 32.0f);
-    GUI_Float(GUI_GridNextX(), &font_setup->blink_size.y, colors, 0.0f, 128.0f);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "blink size");
+    GUI_Float(GUI_MakeBox(GUI_GridNextX(), colors), &font_setup->blink_size.x, 0.0f, 32.0f);
+    GUI_Float(GUI_MakeBox(GUI_GridNextX(), colors), &font_setup->blink_size.y, 0.0f, 128.0f);
 
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "blink delta", colors);
-    GUI_Float(GUI_GridNextX(), &font_setup->blink_delta.x, colors, -64.0f, 64.0f);
-    GUI_Float(GUI_GridNextX(), &font_setup->blink_delta.y, colors, -64.0f, 64.0f);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "blink delta");
+    GUI_Float(GUI_MakeBox(GUI_GridNextX(), colors), &font_setup->blink_delta.x, -64.0f, 64.0f);
+    GUI_Float(GUI_MakeBox(GUI_GridNextX(), colors), &font_setup->blink_delta.y, -64.0f, 64.0f);
 
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "blink alpha", colors);
-    GUI_Float(GUI_GridNextXn(2), &font_setup->blink_alpha, colors, 0.0f, 1.0f);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "blink alpha");
+    GUI_Float(GUI_MakeBox(GUI_GridNextXn(2), colors), &font_setup->blink_alpha, 0.0f, 1.0f);
 
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "filter", colors);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "filter");
     {
         int selected_filter = font_setup->texture_filter;
         GUI_MenuItems filter_items = GUI_GetTextureFilterMenuItems(&selected_filter);
         const GUI_MenuItem *filter_item = GUI_MenuItemGetSelected(&filter_items);
-        GUI_ButtonMenu(GUI_GridNextXn(2), &font_setup->texture_filter, filter_item->label, GUI_GetIconTexture(filter_item->icon), colors, GUI_FontFilterMenu);
+        GUI_ButtonMenu(GUI_MakeBox(GUI_GridNextXn(2), colors), &font_setup->texture_filter, filter_item->label, GUI_GetIconTexture(filter_item->icon), GUI_FontFilterMenu);
     }
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextXn(3), "combine filtering with non-integer scaling", colors);
+    GUI_Text(GUI_MakeBox(GUI_GridNextXn(3), colors), "combine filtering with non-integer scaling");
 
     bool use_atlas = font_setup->atlas_reload_size > 0
         || font_setup->atlas.ready
         || font_setup->atlas.texture.id != 0;
 
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "mode", colors);
-    GUI_Text(GUI_GridNextX(), use_atlas ? "atlas" : "plain", colors);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "mode");
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), use_atlas ? "atlas" : "plain");
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "reload", colors);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "reload");
     if (use_atlas) {
         float atlas_reload_size = (float)font_setup->atlas_reload_size;
-        GUI_Float(GUI_GridNextX(), &atlas_reload_size, colors, 8.0f, 128.0f);
+        GUI_Float(GUI_MakeBox(GUI_GridNextX(), colors), &atlas_reload_size, 8.0f, 128.0f);
         font_setup->atlas_reload_size = (int)roundf(atlas_reload_size);
     } else {
-        GUI_Text(GUI_GridNextX(), "-", colors);
+        GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "-");
     }
-    if (GUI_Button(GUI_GridNextX(), "Reload", NULL, colors)) {
+    if (GUI_Button(GUI_MakeBox(GUI_GridNextX(), colors), "Reload", NULL)) {
         GUI_ReloadFontSetupAsset(font_target);
     }
 
     if (use_atlas) {
         GUI_GridForDuplicate();
-        GUI_Text(GUI_GridNextX(), "atlas", colors);
-        GUI_Text(GUI_GridNextXn(2),
+        GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "atlas");
+        GUI_Text(GUI_MakeBox(GUI_GridNextXn(2), colors),
             TextFormat("%dx%d px:%d ready:%d",
                 font_setup->atlas.atlas_width,
                 font_setup->atlas.atlas_height,
                 font_setup->atlas.pixel_size,
-                font_setup->atlas.ready),
-            colors);
+                font_setup->atlas.ready));
     }
 
     GUI_GridForDuplicate();
-    GUI_Text(GUI_GridNextX(), "Preview", colors);
+    GUI_Text(GUI_MakeBox(GUI_GridNextX(), colors), "Preview");
     GUI_SetFont(font_target);
-    GUI_Text(GUI_GridNextXn(2), "Scale 123 Font", colors);
+    GUI_Text(GUI_MakeBox(GUI_GridNextXn(2), colors), "Scale 123 Font");
 }
 
 void WIN_Logo(GUI_Window* window)
@@ -398,7 +397,7 @@ void WIN_Logo(GUI_Window* window)
 
     // Label
     GUI_GridForXY(workspace.width, default_height, 0);
-    GUI_Text(GUI_GridNextY(), "Broky logo", window->colors);
+    GUI_Text(GUI_MakeBox(GUI_GridNextY(), window->colors), "Broky logo");
     // Image
     Rectangle next = GUI_GridNextY();
     GUI_Image(logo, (Rectangle){ next.x, next.y, next.width, 320 });
@@ -416,7 +415,7 @@ void WIN_Winman(GUI_Window* window)
     GUI_GridForXY(window_workspace.width, default_height, 0);
 
     static GUI_Window* win_window = NULL;
-    if (GUI_Button(GUI_GridNextY(), "Sample window", NULL, window->colors)) {
+    if (GUI_Button(GUI_MakeBox(GUI_GridNextY(), window->colors), "Sample window", NULL)) {
         int win_id = 2;
         if (win_window == NULL || win_window->id == 0) {
             win_window = GUI_OpenWindow(win_id, "Sample window", EGUI_ThemeColor_Abstractica, &icons->Dog, false, WIN_Window);
@@ -424,7 +423,7 @@ void WIN_Winman(GUI_Window* window)
         GUI_ForceZindex(win_id);
     }
     static GUI_Window* win_layouts = NULL;
-    if (GUI_Button(GUI_GridNextY(), "Layouts window", NULL, window->colors)) {
+    if (GUI_Button(GUI_MakeBox(GUI_GridNextY(), window->colors), "Layouts window", NULL)) {
         int win_id = 3;
         if (win_layouts == NULL || win_layouts->id == 0) {
             win_layouts = GUI_OpenWindow(win_id, "Layouts window", EGUI_ThemeColor_Gray, &icons->Layouts, false, WIN_Layouts);
@@ -432,7 +431,7 @@ void WIN_Winman(GUI_Window* window)
         GUI_ForceZindex(win_id);
     }
     static GUI_Window* win_character_debug = NULL;
-    if (GUI_Button(GUI_GridNextY(), "Character debug", NULL, window->colors)) {
+    if (GUI_Button(GUI_MakeBox(GUI_GridNextY(), window->colors), "Character debug", NULL)) {
         int win_id = 4;
         if (win_character_debug == NULL || win_character_debug->id == 0) {
             win_character_debug = GUI_OpenWindow(win_id, "Character debug", EGUI_ThemeColor_Gray, &icons->Dog, false, WIN_CharacterDebug);
@@ -440,7 +439,7 @@ void WIN_Winman(GUI_Window* window)
         GUI_ForceZindex(win_id);
     }
     static GUI_Window* win_settings = NULL;
-    if (GUI_Button(GUI_GridNextY(), "Settings", &icons->Setup, window->colors)) {
+    if (GUI_Button(GUI_MakeBox(GUI_GridNextY(), window->colors), "Settings", &icons->Setup)) {
         int win_id = 5;
         if (win_settings == NULL || win_settings->id == 0) {
             win_settings = GUI_OpenWindow(win_id, "Settings", EGUI_ThemeColor_Gray, &icons->Setup, true, WIN_Settings);
@@ -448,7 +447,7 @@ void WIN_Winman(GUI_Window* window)
         GUI_ForceZindex(win_id);
     }
     static GUI_Window* win_font_settings = NULL;
-    if (GUI_Button(GUI_GridNextY(), "Font settings", &icons->Setup, window->colors)) {
+    if (GUI_Button(GUI_MakeBox(GUI_GridNextY(), window->colors), "Font settings", &icons->Setup)) {
         int win_id = 7;
         if (win_font_settings == NULL || win_font_settings->id == 0) {
             win_font_settings = GUI_OpenWindow(win_id, "Font settings", EGUI_ThemeColor_Gray, &icons->Setup, true, WIN_FontSettings);
@@ -458,7 +457,7 @@ void WIN_Winman(GUI_Window* window)
         GUI_ForceZindex(win_id);
     }
     static GUI_Window* win_logo = NULL;
-    if (GUI_Button(GUI_GridNextY(), "Logo window", &icons->Dog, window->colors)) {
+    if (GUI_Button(GUI_MakeBox(GUI_GridNextY(), window->colors), "Logo window", &icons->Dog)) {
         int win_id = 6;
         if (win_logo == NULL || win_logo->id == 0) {
             win_logo = GUI_OpenWindow(win_id, "Logo", EGUI_ThemeColor_Abstractica, &icons->Dog, false, WIN_Logo);
@@ -469,17 +468,17 @@ void WIN_Winman(GUI_Window* window)
     }
 
 
-    GUI_Text(GUI_GridNextY(), "--- Opened windows ---", window->colors);
+    GUI_Text(GUI_MakeBox(GUI_GridNextY(), window->colors), "--- Opened windows ---");
     GUI_GridForDuplicate();
     for (int i = 0; i < GUI_MAX_OPEN_WINS; ++i) {
         GUI_Window* win = &state->window_s[i];
         if (win->id == 0 || window->id == win->id) continue;
-        if (GUI_Button(GUI_GridNextY(), TextFormat("%d - %s", win->id, win->title), NULL, window->colors)) {
+        if (GUI_Button(GUI_MakeBox(GUI_GridNextY(), window->colors), TextFormat("%d - %s", win->id, win->title), NULL)) {
             GUI_ForceZindex(win->id);
         }
     }
 
-    GUI_Text(GUI_GridNextY(), "--- Global values ---", window->colors);
+    GUI_Text(GUI_MakeBox(GUI_GridNextY(), window->colors), "--- Global values ---");
 
     // NOTE:
     // GUI_IsPointerOverGui() is not safe to be called by a Window. It requires ALL windows to be processed beforehand.
@@ -490,23 +489,23 @@ void WIN_Winman(GUI_Window* window)
         Rectangle t_shape = GUI_GetWindowTitle(active->shape);
         Rectangle w_shape = active->shape;
 
-        GUI_Text(GUI_GridNextY(), "--- Focused window ---", window->colors);
-        GUI_Text(GUI_GridNextY(), TextFormat("ID=%d scroll=%.2f content_height=%.2f", active->id, active->scroll_offset, active->content_height),  window->colors);
+        GUI_Text(GUI_MakeBox(GUI_GridNextY(), window->colors), "--- Focused window ---");
+        GUI_Text(GUI_MakeBox(GUI_GridNextY(), window->colors), TextFormat("ID=%d scroll=%.2f content_height=%.2f", active->id, active->scroll_offset, active->content_height));
 
-        GUI_Text(GUI_GridNextY(), "title_shape", window->colors);
-        GUI_Text(GUI_GridNextY(), TextFormat("x=%.2f  y=%.2f w=%.2f  h=%.2f", t_shape.y,  t_shape.x, t_shape.width, t_shape.height), window->colors);
+        GUI_Text(GUI_MakeBox(GUI_GridNextY(), window->colors), "title_shape");
+        GUI_Text(GUI_MakeBox(GUI_GridNextY(), window->colors), TextFormat("x=%.2f  y=%.2f w=%.2f  h=%.2f", t_shape.y,  t_shape.x, t_shape.width, t_shape.height));
 
-        GUI_Text(GUI_GridNextY(), "window_shape", window->colors);
-        GUI_Text(GUI_GridNextY(), TextFormat("x=%.2f  y=%.2f w=%.2f  h=%.2f", w_shape.x, w_shape.y, w_shape.width, w_shape.height),  window->colors);
-        GUI_Text(GUI_GridNextY(), "--- End focused window ---", window->colors);
+        GUI_Text(GUI_MakeBox(GUI_GridNextY(), window->colors), "window_shape");
+        GUI_Text(GUI_MakeBox(GUI_GridNextY(), window->colors), TextFormat("x=%.2f  y=%.2f w=%.2f  h=%.2f", w_shape.x, w_shape.y, w_shape.width, w_shape.height));
+        GUI_Text(GUI_MakeBox(GUI_GridNextY(), window->colors), "--- End focused window ---");
     }
 
     Rectangle next = GUI_GridNextY();
     float icon_w = GUI_GetIconWidth();
-    GUI_Face((Vector2){ next.x, next.y }, (float) icon_w / 2);
-    GUI_Face((Vector2){ next.x + (float) icon_w / 2, next.y }, icon_w);
-    GUI_Face((Vector2){ next.x + (float) icon_w / 2 + icon_w, next.y }, icon_w * 2);
-    GUI_Icon(&icons->Dog, (Vector2){ next.x + (float) icon_w / 2 + icon_w * 3, next.y }, icon_w * 2, WHITE);
+    GUI_Face(GUI_MakePin((Vector2){ next.x, next.y }, (float) icon_w / 2));
+    GUI_Face(GUI_MakePin((Vector2){ next.x + (float) icon_w / 2, next.y }, icon_w));
+    GUI_Face(GUI_MakePin((Vector2){ next.x + (float) icon_w / 2 + icon_w, next.y }, icon_w * 2));
+    GUI_Icon(&icons->Dog, GUI_MakePin((Vector2){ next.x + (float) icon_w / 2 + icon_w * 3, next.y }, icon_w * 2), WHITE);
     GUI_GridNextY(); // Jump line
     GUI_GridNextY(); // Jump line
 

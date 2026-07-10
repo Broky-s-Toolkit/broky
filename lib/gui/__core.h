@@ -191,6 +191,19 @@ typedef struct {
 // < END SUBMODULE: SETUP
 
 // > TYPES
+//   SUBMODULE: CONTROLS
+typedef struct {
+    Rectangle       shape;
+    EGUI_ThemeColor colors;
+} GUI_Box;
+
+typedef struct {
+    Vector2         position;
+    float           height;
+} GUI_Pin;
+// < END SUBMODULE: CONTROLS
+
+// > TYPES
 //   SUBMODULE: WINDOW
 #define MAX_WINDOW_TITLE 16
 
@@ -261,6 +274,8 @@ typedef struct {
 } GUI_MenuItems;
 
 const GUI_MenuItem *GUI_MenuItemGetSelected(GUI_MenuItems *items);
+GUI_Box             GUI_MakeBox(Rectangle shape, EGUI_ThemeColor colors);
+GUI_Pin             GUI_MakePin(Vector2 position, float height);
 
 #ifdef IMPLEMENT_ALL
 const GUI_MenuItem *GUI_MenuItemGetSelected(GUI_MenuItems *items)
@@ -277,6 +292,24 @@ const GUI_MenuItem *GUI_MenuItemGetSelected(GUI_MenuItems *items)
     }
 
     return &items->elements[0];
+}
+
+GUI_Box GUI_MakeBox(Rectangle shape, EGUI_ThemeColor colors)
+{
+    GUI_Box box = {
+        .shape      = shape,
+        .colors     = colors
+    };
+    return box;
+}
+
+GUI_Pin GUI_MakePin(Vector2 position, float height)
+{
+    GUI_Pin pin = {
+        .position   = position,
+        .height     = height
+    };
+    return pin;
 }
 #endif
 

@@ -79,11 +79,11 @@ void GUI_WindowButtonPanel(GUI_Window* window, EGUI_Font font)
     Rectangle shape_panel       = GUI_GetWindowPanel(window->shape);
     Vector2 position_button     = (Vector2) { shape_panel.x + border * scale, shape_panel.y };
 
-    if (GUI_IconButton(&icons->CloseSmall, position_button, icon_sm_width, WHITE)) {
+    if (GUI_IconButton(&icons->CloseSmall, GUI_MakePin(position_button, icon_sm_width), WHITE)) {
         GUI_RemoveWindow(window->id);
     }
 
-    GUI_Icon(&icons->MinimizeSmall, AddVector2(position_button, 0, icon_sm_width + border * scale), icon_sm_width, WHITE);
+    GUI_Icon(&icons->MinimizeSmall, GUI_MakePin(AddVector2(position_button, 0, icon_sm_width + border * scale), icon_sm_width), WHITE);
 }
 
 void GUI_WindowEndingPanel(GUI_Window* window, EGUI_Font font)
@@ -152,10 +152,10 @@ void GUI_DrawWindow(GUI_Window* window,  EGUI_ControlStatus status, EGUI_Font fo
 
     Vector2 icon_position = { shape_title.x + border * scale, shape_title.y + border * scale };
     if (window->icon != NULL && icon_w > 0) {
-        GUI_Icon(window->icon, icon_position, icon_w, WHITE);
+        GUI_Icon(window->icon, GUI_MakePin(icon_position, icon_w), WHITE);
     }
     if (status == EGUI_ControlStatus_Focused && icon_w > 0 && window->focused_face) {
-        GUI_Face((Vector2) { shape_title.x + border * scale, shape_title.y + border * scale }, icon_w);
+        GUI_Face(GUI_MakePin((Vector2) { shape_title.x + border * scale, shape_title.y + border * scale }, icon_w));
     }
 
     // Vertical scroll
