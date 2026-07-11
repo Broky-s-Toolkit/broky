@@ -84,7 +84,9 @@
           "comment.line.double-slash.c",
           "comment.line.double-slash.cpp",
           "comment.block.c",
-          "comment.block.cpp"
+          "comment.block.cpp",
+          "punctuation.definition.comment.c",
+          "punctuation.definition.comment.cpp"
         ],
         "settings": {
           "foreground": "#779568",
@@ -351,6 +353,17 @@
         "settings": {
           "foreground": "#aaaeb3"
         }
+      },
+      {
+        "scope": [
+          "storage.type.primitive.c",
+          "storage.type.primitive.cpp",
+          "storage.type.built-in.primitive.c",
+          "storage.type.built-in.primitive.cpp"
+        ],
+        "settings": {
+          "foreground": "#569CD6"
+        }
       }
     ]
   },
@@ -390,6 +403,8 @@
     "contrastBorder": "#00000000",
     "contrastActiveBorder": "#00000000",
     "widget.border": "#00000000",
+    "editor.background": "#1d191e",
+    "editorGutter.background": "#1d191e",
     "editor.lineHighlightBorder": "#00000000",
     "editorGroup.border": "#00000000",
     "editorGroup.dropBackground": "#00000000",
