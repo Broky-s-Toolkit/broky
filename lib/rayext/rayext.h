@@ -12,7 +12,14 @@
         } \
     } while (0)
 
-#define StaticAssert(cond, msg) _Static_assert((cond), msg)
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+    #define StaticAssert(cond, msg) _Static_assert((cond), #msg)
+#else
+    #define STATIC_ASSERT_JOIN_(a, b) a##b
+    #define STATIC_ASSERT_JOIN(a, b) STATIC_ASSERT_JOIN_(a, b)
+    #define StaticAssert(cond, msg) \
+        typedef char STATIC_ASSERT_JOIN(static_assert_failed_##msg##_line_, __LINE__)[(cond) ? 1 : -1]
+#endif
 
 const char* BuildTimeFormatted()
 {
