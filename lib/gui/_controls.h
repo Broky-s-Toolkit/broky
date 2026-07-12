@@ -373,11 +373,11 @@ void GUI_DrawButton(
     GUI_Box box, const char *text, Texture2D *icon,
     EGUI_ControlStatus status, EGUI_Font font)
 {
-    Rectangle shape = box.shape;
-    GUI_State *state            = GUI_CTX.state;
-    GUI_FontSetup *font_setup   = GUI_GetFontSetup(font);
-    GUI_Theme *theme            = &GUI_CTX.setup->theme;
-    GUI_ThemeColors theme_colors = GUI_GetThemeColors(box.colors);
+    Rectangle shape                 = box.shape;
+    GUI_State *state                = GUI_CTX.state;
+    GUI_FontSetup *font_setup       = GUI_GetFontSetup(font);
+    GUI_Theme *theme                = &GUI_CTX.setup->theme;
+    GUI_ThemeColors theme_colors    = GUI_GetThemeColors(box.opt.colors);
 
     float border        = font_setup->border;
     float scale         = state->scale;
@@ -448,7 +448,7 @@ bool GUI_ButtonMenu(
             GUI_OverlayClose();
         } else {
             // Set overlay call
-            GUI_OverlaySetDrawCall(just_interacted, box.colors, draw_function);
+            GUI_OverlaySetDrawCall(just_interacted, box.opt.colors, draw_function);
         }
     }
 
@@ -489,7 +489,7 @@ bool GUI_ButtonMenuContents(int x, int x_end, int start_row, EGUI_ThemeColor col
 
             const GUI_MenuItem *item = &items->elements[item_index];
             Rectangle item_shape = GUI_GridBetween(x, draw_row, x_end, draw_row);
-            if (GUI_Button(GUI_MakeBox(item_shape, colors), item->label, GUI_GetIconTexture(item->icon))) {
+            if (GUI_Button(GUI_MakeBoxColor(item_shape, colors), item->label, GUI_GetIconTexture(item->icon))) {
                 changed = *items->selected_value != item->value;
                 *items->selected_value = item->value;
             }
@@ -504,10 +504,10 @@ bool GUI_ButtonMenuContents(int x, int x_end, int start_row, EGUI_ThemeColor col
 void GUI_DrawText(
     GUI_Box box, const char* text, EGUI_Font font)
 {
-    Rectangle shape = box.shape;
-    GUI_State *state            = GUI_CTX.state;
-    GUI_FontSetup *font_setup   = GUI_GetFontSetup(font);
-    GUI_ThemeColors theme_colors = GUI_GetThemeColors(box.colors);
+    Rectangle shape                 = box.shape;
+    GUI_State *state                = GUI_CTX.state;
+    GUI_FontSetup *font_setup       = GUI_GetFontSetup(font);
+    GUI_ThemeColors theme_colors    = GUI_GetThemeColors(box.opt.colors);
 
     float border    = font_setup->border;
     float scale     = state->scale;
@@ -534,7 +534,7 @@ void GUI_DrawInput(
     GUI_State       *state          = GUI_CTX.state;
     GUI_FontSetup   *font_setup     = GUI_GetFontSetup(font);
     GUI_Theme       *theme          = &GUI_CTX.setup->theme;
-    GUI_ThemeColors theme_colors    = GUI_GetThemeColors(box.colors);
+    GUI_ThemeColors theme_colors    = GUI_GetThemeColors(box.opt.colors);
 
     float border        = font_setup->border;
     float scale         = state->scale;
@@ -780,7 +780,7 @@ void GUI_Float(GUI_Box box, float *value, float min, float max)
         snprintf(buf_default, sizeof(buf_default), "%.6g", (double)*value);
     }
     char *buf = is_focused ? buf_focused : buf_default;
-    GUI_Input(GUI_MakeBox(shape_original, box.colors), value, buf,
+    GUI_Input(GUI_MakeBoxColor(shape_original, box.opt.colors), value, buf,
         sizeof(buf_default) /* Intentionally not using buf */,
         EGUI_Input_Float);
 
@@ -803,7 +803,7 @@ void GUI_DrawCheck(
     GUI_State       *state          = GUI_CTX.state;
     GUI_FontSetup   *font_setup     = GUI_GetFontSetup(font);
     GUI_Theme       *theme          = &GUI_CTX.setup->theme;
-    GUI_ThemeColors theme_colors    = GUI_GetThemeColors(box.colors);
+    GUI_ThemeColors theme_colors    = GUI_GetThemeColors(box.opt.colors);
 
     float border        = font_setup->border;
     float scale         = state->scale;

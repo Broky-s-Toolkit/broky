@@ -223,7 +223,7 @@ GUI_Box GUI_MakeBox(Rectangle shape)
         .shape      = shape,
         .opt        = (GUI_Params) {
             .font   = GUI_GetFont(),
-            .colors = GUI_GetThemeColors(EGUI_ThemeColor_Gray)
+            .colors = EGUI_ThemeColor_Gray
         }
     };
     return box;
@@ -235,7 +235,7 @@ GUI_Box GUI_MakeBoxColor(Rectangle shape, EGUI_ThemeColor color)
         .shape      = shape,
         .opt        = (GUI_Params) {
             .font   = GUI_GetFont(),
-            .colors = GUI_GetThemeColors(color)
+            .colors = color
         }
     };
     return box;
