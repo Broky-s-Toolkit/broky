@@ -21,3 +21,4 @@ vs-project
 cmake-build-debug
 cmake-build-*
 tmp/cmake-build-*
+debug.log

@@ -1,4 +1,5 @@
 {
+  "C_Cpp.intelliSenseEngine": "default",
   "files.exclude": {
     ".idea": true,
     ".junie": true
@@ -364,6 +365,61 @@
         "settings": {
           "foreground": "#569CD6"
         }
+      },
+      {
+        "scope": [
+          "punctuation.definition.string.begin.c",
+          "punctuation.definition.string.end.c",
+          "string.quoted.double.include.c"
+        ],
+        "settings": {
+          "foreground": "#CF8E6D"
+        }
+      },
+      {
+        "scope": [
+          "punctuation.section.parameters.begin.bracket.round.c",
+          "punctuation.section.parameters.end.bracket.round.c"
+        ],
+        "settings": {
+          "foreground": "#DC7C57"
+        }
+      },
+      {
+        "scope": [
+          "punctuation.section.arguments.begin.bracket.round.c",
+          "punctuation.section.arguments.end.bracket.round.c"
+        ],
+        "settings": {
+          "foreground": "#DC7C57"
+        }
+      },
+      {
+        "scope": "punctuation.terminator.statement.c",
+        "settings": {
+          "foreground": "#DC7C57"
+        }
+      },
+      {
+        "scope": "punctuation.separator.dot-access.c",
+        "settings": {
+          "foreground": "#DC7C57"
+        }
+      },
+      {
+        "scope": [
+          "punctuation.definition.begin.bracket.square.c",
+          "punctuation.definition.end.bracket.square.c"
+        ],
+        "settings": {
+          "foreground": "#DC7C57"
+        }
+      },
+      {
+        "scope": "punctuation.separator.delimiter.c",
+        "settings": {
+          "foreground": "#DC7C57"
+        }
       }
     ]
   },
@@ -394,6 +450,7 @@
       "keyword.directive": "#dc7c57",
       "modifier": "#dc7c57",
       "operator": "#dc7c57",
+      "punctuation": "#DC7C57",
       "string": "#cf8e6d",
       "variable.defaultLibrary": "#aaaeb3"
     }
