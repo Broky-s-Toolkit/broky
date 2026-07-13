@@ -146,19 +146,19 @@ void WIN_Window(GUI_Window* window)
     GUI_GridNextX();
     GUI_ButtonMenu(GUI_MakeBoxColor(GUI_GridNextX(), EGUI_ThemeColor_Abstractica), &game_menu_2_owner, "Game 2", &icons->Dog, GUI_GameMenu);
 
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     // 1st input (textbox)
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "Text");
     GUI_Input(GUI_MakeBoxColor(GUI_GridNextXn(2), colors), win_state->input_contents, win_state->input_contents, (int)sizeof(win_state->input_contents), EGUI_Input_Text);
 
     // 2nd input for integer
     // TODO@dc: add min, max and parsing
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "Int");
     GUI_Input(GUI_MakeBoxColor(GUI_GridNextXn(2), colors), win_state->input_int_contents, win_state->input_int_contents, (int)sizeof(win_state->input_int_contents), EGUI_Input_Int);
 
     // 3rd input for float
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "Float");
     GUI_Input(GUI_MakeBoxColor(GUI_GridNextXn(2), colors), win_state->input_float_contents, win_state->input_float_contents, (int)sizeof(win_state->input_float_contents), EGUI_Input_Float);
 }
@@ -224,35 +224,35 @@ void WIN_CharacterDebug(GUI_Window* window)
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "shape.x");
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), TextFormat("%.2f", ch->shape.x));
 
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "shape.y");
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), TextFormat("%.2f", ch->shape.y));
 
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "shape.w");
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), TextFormat("%.2f", ch->shape.width));
 
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "shape.h");
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), TextFormat("%.2f", ch->shape.height));
 
     // Color (RGB)
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "color");
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), TextFormat("r:%d g:%d b:%d a:%d",
         ch->color.r, ch->color.g, ch->color.b, ch->color.a));
 
     // Movement
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "movement.x");
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), TextFormat("%.3f", ch->movement.x));
 
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "movement.y");
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), TextFormat("%.3f", ch->movement.y));
 
     // Animation time
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "anim_time");
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), TextFormat("%.3f", ch->anim_time));
 }
@@ -270,15 +270,15 @@ void WIN_Settings(GUI_Window* window)
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "Scale");
     GUI_Float(GUI_MakeBoxColor(GUI_GridNextXn(2), colors), &state->scale, 0.5f, 6.0f);
 
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "Scale 2");
     GUI_Float(GUI_MakeBoxColor(GUI_GridNextXn(2), colors), &state->scale, 0.5f, 6.0f);
 
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "Wallpaper");
     GUI_Check(GUI_MakeBoxColor(GUI_GridNextXn(2), EGUI_ThemeColor_Red), &win_state->checkbox_value, "ON", "OFF");
 
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "Font");
     if (GUI_Button(GUI_MakeBoxColor(GUI_GridNextXn(2), colors), GAME_GetFontLabel(win_state->demo_font), NULL)) {
         win_state->demo_font = (EGUI_Font)((win_state->demo_font + 1) % EGUI_Font_Count);
@@ -298,48 +298,48 @@ void WIN_FontSettings(GUI_Window* window)
     GUI_SetFont(EGUI_Font_Default);
     GUI_GridForCols(3, GUI_CalcDefaultHeightScaled(GUI_GetFont()));
 
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "Editing");
     GUI_ButtonMenu(GUI_MakeBoxColor(GUI_GridNextXn(2), colors), &win_state->editor_font, item->label, GUI_GetIconTexture(item->icon), GUI_FontSettingsMenu);
     font_target = win_state->editor_font;
     font_setup = &setup->fonts[font_target];
 
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "default_h");
     GUI_Float(GUI_MakeBoxColor(GUI_GridNextXn(2), colors), &font_setup->default_height, 8.0f, 128.0f);
 
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "border");
     GUI_Float(GUI_MakeBoxColor(GUI_GridNextXn(2), colors), &font_setup->border, 0.0f, 16.0f);
 
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "scale");
     GUI_Float(GUI_MakeBoxColor(GUI_GridNextXn(2), colors), &font_setup->scale, 0.1f, 8.0f);
 
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "spacing");
     GUI_Float(GUI_MakeBoxColor(GUI_GridNextXn(2), colors), &font_setup->spacing, -8.0f, 32.0f);
 
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "delta.x");
     GUI_Float(GUI_MakeBoxColor(GUI_GridNextX(), colors), &font_setup->delta.x, -64.0f, 64.0f);
     GUI_Float(GUI_MakeBoxColor(GUI_GridNextX(), colors), &font_setup->delta.y, -64.0f, 64.0f);
 
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "blink size");
     GUI_Float(GUI_MakeBoxColor(GUI_GridNextX(), colors), &font_setup->blink_size.x, 0.0f, 32.0f);
     GUI_Float(GUI_MakeBoxColor(GUI_GridNextX(), colors), &font_setup->blink_size.y, 0.0f, 128.0f);
 
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "blink delta");
     GUI_Float(GUI_MakeBoxColor(GUI_GridNextX(), colors), &font_setup->blink_delta.x, -64.0f, 64.0f);
     GUI_Float(GUI_MakeBoxColor(GUI_GridNextX(), colors), &font_setup->blink_delta.y, -64.0f, 64.0f);
 
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "blink alpha");
     GUI_Float(GUI_MakeBoxColor(GUI_GridNextXn(2), colors), &font_setup->blink_alpha, 0.0f, 1.0f);
 
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "filter");
     {
         int selected_filter = font_setup->texture_filter;
@@ -347,17 +347,17 @@ void WIN_FontSettings(GUI_Window* window)
         const GUI_MenuItem *filter_item = GUI_MenuItemGetSelected(&filter_items);
         GUI_ButtonMenu(GUI_MakeBoxColor(GUI_GridNextXn(2), colors), &font_setup->texture_filter, filter_item->label, GUI_GetIconTexture(filter_item->icon), GUI_FontFilterMenu);
     }
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextXn(3), colors), "combine filtering with non-integer scaling");
 
     bool use_atlas = font_setup->atlas_reload_size > 0
         || font_setup->atlas.ready
         || font_setup->atlas.texture.id != 0;
 
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "mode");
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), use_atlas ? "atlas" : "plain");
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "reload");
     if (use_atlas) {
         float atlas_reload_size = (float)font_setup->atlas_reload_size;
@@ -371,7 +371,7 @@ void WIN_FontSettings(GUI_Window* window)
     }
 
     if (use_atlas) {
-        GUI_GridForDuplicate();
+        GUI_GridRepeat();
         GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "atlas");
         GUI_Text(GUI_MakeBoxColor(GUI_GridNextXn(2), colors),
             TextFormat("%dx%d px:%d ready:%d",
@@ -381,7 +381,7 @@ void WIN_FontSettings(GUI_Window* window)
                 font_setup->atlas.ready));
     }
 
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextX(), colors), "Preview");
     GUI_SetFont(font_target);
     GUI_Text(GUI_MakeBoxColor(GUI_GridNextXn(2), colors), "Scale 123 Font");
@@ -470,7 +470,7 @@ void WIN_Winman(GUI_Window* window)
 
 
     GUI_Text(GUI_MakeBox(GUI_GridNextY()), "--- Opened windows ---");
-    GUI_GridForDuplicate();
+    GUI_GridRepeat();
     for (int i = 0; i < GUI_MAX_OPEN_WINS; ++i) {
         GUI_Window* win = &state->window_s[i];
         if (win->id == 0 || window->id == win->id) continue;

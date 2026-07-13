@@ -22,7 +22,7 @@ void            GUI_GridForX(float w);
 void            GUI_GridForY(float h);
 void            GUI_GridForXY(float w, float h, float h_keep);
 void            GUI_GridForCols(int columns, float default_height);
-void            GUI_GridForDuplicate(void);
+void            GUI_GridRepeat(void);
 void            GUI_GridClearWorkspace(void);
 // > IN PLACE QUERIES
 Rectangle       GUI_GridAt(int x, int y);
@@ -178,7 +178,7 @@ void GUI_GridForCols(int columns, float default_height)
     GUI_GridForXY(width / (float)columns, default_height, 0);
 }
 
-void GUI_GridForDuplicate(void)
+void GUI_GridRepeat(void)
 {
     GUI_GridForXY(GUI_CTX.temp->grid.horizontal_size, GUI_CTX.temp->grid.vertical_size, 0);
 }
