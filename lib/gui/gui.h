@@ -47,8 +47,10 @@ GUI_Temp GUI_MakeTempDefault(void)
     GUI_Temp temp = {
         .status                     = EGUI_Status_Off,
         .control_focus_ptr          = NULL,
-        .current_font               = EGUI_Font_Default,
-        .current_theme_colors       = EGUI_ThemeColor_Gray,
+        .opt                        = {
+            .font                   = EGUI_Font_Default,
+            .colors                 = EGUI_ThemeColor_Gray,
+        },
         .grid                       = GUI_MakeGrid(),
         .overlay                    = GUI_MakeOverlay(),
         .cursor                     = EGUI_Cursor_Default,

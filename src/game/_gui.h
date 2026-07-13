@@ -30,7 +30,7 @@ void GUI_ProgramMenu()
 {
     int x = -1;
     GUI_Icons *icons        = GUI_GetIcons();
-    GUI_Params opt          = (GUI_Params) { .colors = GUI_OverlayColors() };
+    GUI_Opt opt             = (GUI_Opt) { .colors = GUI_OverlayColors() };
     GUI_BeginOverlay(true, true);
         GUI_Button(GUI_MakeBoxEx(GUI_GridAt(x,1), opt), "New", &icons->New);
         GUI_Button(GUI_MakeBoxEx(GUI_GridAt(x,2), opt), "Open", &icons->Open);
@@ -44,7 +44,7 @@ void GUI_GameMenu()
 {
     GUI_Icons *icons        = GUI_GetIcons();
     GAME_Actions *actions   = &GAME_CTX.temp->player_actions;
-    GUI_Params opt          = (GUI_Params) { .colors = GUI_OverlayColors() };
+    GUI_Opt opt             = (GUI_Opt) { .colors = GUI_OverlayColors() };
     GUI_BeginOverlay(true, true);
         GUI_Button(GUI_MakeBoxEx(GUI_GridAt(-1, 0), opt), "Game [X]", &icons->Dog);
         actions->reset_characters    = GUI_Button(GUI_MakeBoxEx(GUI_GridAt(-1,1), opt), "Reset", &icons->New);

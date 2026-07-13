@@ -257,8 +257,7 @@ Font GUI_GetFontAsset(EGUI_Font font)
 
 EGUI_Font GUI_GetFont(void)
 {
-    EGUI_Font font = GUI_CTX.temp->current_font;
-    return font;
+    return GUI_CTX.temp->opt.font;
 }
 
 void GUI_ReloadFontSetupAsset(EGUI_Font font)
@@ -304,7 +303,7 @@ void GUI_ReloadFontSetupAsset(EGUI_Font font)
 
 void GUI_SetFont(EGUI_Font font)
 {
-    GUI_CTX.temp->current_font = font;
+    GUI_CTX.temp->opt.font = font;
 }
 // < FONTS
 
@@ -409,12 +408,12 @@ GUI_ThemeColors GUI_GetThemeColors(EGUI_ThemeColor color)
 
 EGUI_ThemeColor GUI_GetThemeColor(void)
 {
-    return GUI_CTX.temp->current_theme_colors;
+    return GUI_CTX.temp->opt.colors;
 }
 
 void GUI_SetThemeColors(EGUI_ThemeColor color)
 {
-    GUI_CTX.temp->current_theme_colors = color;
+    GUI_CTX.temp->opt.colors = color;
 }
 // < THEME
 

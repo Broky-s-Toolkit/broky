@@ -195,11 +195,11 @@ typedef struct {
 typedef struct {
     EGUI_ThemeColor colors;
     EGUI_Font       font;
-} GUI_Params;
+} GUI_Opt;
 
 typedef struct {
     Rectangle       shape;
-    GUI_Params      opt;
+    GUI_Opt         opt;
 } GUI_Box;
 
 typedef struct {
@@ -209,11 +209,12 @@ typedef struct {
 
 GUI_Box             GUI_MakeBox(Rectangle shape);
 GUI_Box             GUI_MakeBoxColor(Rectangle shape, EGUI_ThemeColor color);
-GUI_Box             GUI_MakeBoxEx(Rectangle shape, GUI_Params opt);
+GUI_Box             GUI_MakeBoxEx(Rectangle shape, GUI_Opt opt);
 GUI_Pin             GUI_MakePin(Vector2 position, float height);
 
 // FORWARD DECLARATIONS
 EGUI_Font           GUI_GetFont(void);
+EGUI_ThemeColor     GUI_GetThemeColor(void);
 GUI_ThemeColors     GUI_GetThemeColors(EGUI_ThemeColor color);
 
 #ifdef IMPLEMENT_ALL
@@ -221,9 +222,9 @@ GUI_Box GUI_MakeBox(Rectangle shape)
 {
     GUI_Box box = {
         .shape      = shape,
-        .opt        = (GUI_Params) {
+        .opt        = (GUI_Opt) {
             .font   = GUI_GetFont(),
-            .colors = EGUI_ThemeColor_Gray
+            .colors = GUI_GetThemeColor()
         }
     };
     return box;
@@ -233,7 +234,7 @@ GUI_Box GUI_MakeBoxColor(Rectangle shape, EGUI_ThemeColor color)
 {
     GUI_Box box = {
         .shape      = shape,
-        .opt        = (GUI_Params) {
+        .opt        = (GUI_Opt) {
             .font   = GUI_GetFont(),
             .colors = color
         }
@@ -241,7 +242,7 @@ GUI_Box GUI_MakeBoxColor(Rectangle shape, EGUI_ThemeColor color)
     return box;
 }
 
-GUI_Box GUI_MakeBoxEx(Rectangle shape, GUI_Params opt)
+GUI_Box GUI_MakeBoxEx(Rectangle shape, GUI_Opt opt)
 {
     GUI_Box box = {
         .shape      = shape,
@@ -365,8 +366,7 @@ typedef struct {
     // Globals
     EGUI_Status      status;
     void             *control_focus_ptr;            // Keeps track between frames if there is a focused control
-    EGUI_Font        current_font;
-    EGUI_ThemeColor  current_theme_colors;
+    GUI_Opt          opt;
 
     // Submodules
     GUI_GridTemp    grid;
