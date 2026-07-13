@@ -1,6 +1,7 @@
 #pragma once
 #ifndef IDE_SYNTAX_HL
  #include "__core.h"
+ #include "_grid.h"
  #include "_setup.h"
  #include "_overlay.h"
  #include "_font.h"
@@ -30,19 +31,19 @@ bool        GUI_IconButton(Texture2D* texture2d, GUI_Pin pin, Color tint);
 void        GUI_Face(GUI_Pin pin);
 void        GUI_Image(Texture2D texture, Rectangle shape);
 // > BUTTON
-void GUI_DrawButton(GUI_Box box, const char *text, Texture2D *icon, EGUI_ControlStatus status, EGUI_Font font);
+void GUI_DrawButton(GUI_Box box, const char *text, Texture2D *icon, EGUI_ControlStatus status);
 bool GUI_Button(GUI_Box box, const char* text, Texture2D* icon);
 bool GUI_ButtonMenu(GUI_Box box, const void* owner_id, const char* text, Texture2D* icon, void (*draw_function)(void));
 bool GUI_ButtonMenuContents(int x, int x_end, int start_row, EGUI_ThemeColor colors, GUI_MenuItems *items, Rectangle *final_shape);
 // > TEXT
-void GUI_DrawText(GUI_Box box, const char* text, EGUI_Font font);
+void GUI_DrawText(GUI_Box box, const char* text);
 void GUI_Text(GUI_Box box, const char* text);
 // > INPUTS
-void GUI_DrawInput(GUI_Box box, char* buffer, int blink_cursor, EGUI_ControlStatus status, bool blink, EGUI_Font font);
+void GUI_DrawInput(GUI_Box box, char* buffer, int blink_cursor, EGUI_ControlStatus status, bool blink);
 void GUI_Input(GUI_Box box, void *owner, char *buffer, int buffer_size, EGUI_InputType type);
 void GUI_Float(GUI_Box box, float *value, float min, float max);
 // > CHECK
-void GUI_DrawCheck(GUI_Box box, bool value, const char *on_txt, const char *off_txt, EGUI_ControlStatus status, EGUI_Font font);
+void GUI_DrawCheck(GUI_Box box, bool value, const char *on_txt, const char *off_txt, EGUI_ControlStatus status);
 void GUI_Check(GUI_Box box, bool *value, const char *on_txt, const char *off_txt);
 
 
@@ -371,11 +372,11 @@ void GUI_Image(Texture2D texture, Rectangle shape)
 // > BUTTON
 void GUI_DrawButton(
     GUI_Box box, const char *text, Texture2D *icon,
-    EGUI_ControlStatus status, EGUI_Font font)
+    EGUI_ControlStatus status)
 {
     Rectangle shape                 = box.shape;
     GUI_State *state                = GUI_CTX.state;
-    GUI_FontSetup *font_setup       = GUI_GetFontSetup(font);
+    GUI_FontSetup *font_setup       = GUI_GetFontSetup(box.opt.font);
     GUI_Theme *theme                = &GUI_CTX.setup->theme;
     GUI_ThemeColors theme_colors    = GUI_GetThemeColors(box.opt.colors);
 
@@ -399,7 +400,7 @@ void GUI_DrawButton(
     GUI_BeginInnerControlScissor(shape, border, scale);
         GUI_DrawAdjustedTextEx(text,
             (Vector2){ shape.x + icon_w + (border) * scale, shape.y + (border) * scale},
-            theme_colors.tx_color_0, scale, font);
+            theme_colors.tx_color_0, scale, box.opt.font);
 
     if (icon_w > 0) {
         GUI_Icon(icon, GUI_MakePin((Vector2) { shape.x + font_setup->border * state->scale, shape.y + font_setup->border * state->scale }, icon_w), WHITE);
@@ -413,13 +414,12 @@ bool GUI_Button(
     Rectangle shape = box.shape;
     GUI_BASE_CONTROL_ACTIVATED(shape);
 
-    EGUI_Font font              = GUI_GetFont();
     EGUI_ControlStatus status   = EGUI_ControlStatus_Default;
     bool cursor_active          = is_cursor_over && IsMouseButtonDown(MOUSE_LEFT_BUTTON);
 
     if (is_cursor_over)  status = EGUI_ControlStatus_Collide;
     if (cursor_active)   status = EGUI_ControlStatus_Focused;
-    GUI_DrawButton(box, text, icon, status, font);
+    GUI_DrawButton(box, text, icon, status);
     // TODO@dc: improve colors DrawDebugRect(shape, ColorAlpha(is_cursor_over? RED : BLUE, 0.2));
     return is_active;
 }
@@ -502,8 +502,9 @@ bool GUI_ButtonMenuContents(int x, int x_end, int start_row, EGUI_ThemeColor col
 
 // > TEXT
 void GUI_DrawText(
-    GUI_Box box, const char* text, EGUI_Font font)
+    GUI_Box box, const char* text)
 {
+    EGUI_Font font                  = box.opt.font;
     Rectangle shape                 = box.shape;
     GUI_State *state                = GUI_CTX.state;
     GUI_FontSetup *font_setup       = GUI_GetFontSetup(font);
@@ -521,17 +522,18 @@ void GUI_DrawText(
 
 void GUI_Text(GUI_Box box, const char* text)
 {
-    GUI_DrawText(box, text, GUI_GetFont());
+    GUI_DrawText(box, text);
 }
 // < END TEXT
 
 // > INPUTS
 void GUI_DrawInput(
     GUI_Box box, char* buffer, int blink_cursor,
-    EGUI_ControlStatus status, bool blink, EGUI_Font font)
+    EGUI_ControlStatus status, bool blink)
 {
-    Rectangle shape = box.shape;
+    Rectangle       shape           = box.shape;
     GUI_State       *state          = GUI_CTX.state;
+    EGUI_Font       font            = box.opt.font;
     GUI_FontSetup   *font_setup     = GUI_GetFontSetup(font);
     GUI_Theme       *theme          = &GUI_CTX.setup->theme;
     GUI_ThemeColors theme_colors    = GUI_GetThemeColors(box.opt.colors);
@@ -624,7 +626,10 @@ void GUI_Input(
     static int      blink_cursor    = 0;
 
     // Font type
-    EGUI_Font font         = GUI_GetFont();
+    EGUI_Font font         = box.opt.font;
+    if (font < 0 || font >= EGUI_Font_Count) {
+        font = GUI_GetFont();
+    }
 
     // Gain focus
     if (just_focused) {
@@ -762,17 +767,14 @@ void GUI_Input(
         is_cursor_over ? EGUI_ControlStatus_Collide :
                           EGUI_ControlStatus_Default;
 
-    GUI_DrawInput(box, buffer, blink_cursor, status, blink_state, font);
+    GUI_DrawInput(box, buffer, blink_cursor, status, blink_state);
 }
 
 void GUI_Float(GUI_Box box, float *value, float min, float max)
 {
-    Rectangle shape = box.shape;
-    Rectangle shape_original = shape;
-
     static char buf_default[256] = {0};
     static char buf_focused[256] = {0};
-    GUI_BASE_CONTROL_FOCUSED(value, shape)
+    GUI_BASE_CONTROL_FOCUSED(value, box.shape)
 
     if (just_focused) {
         snprintf(buf_focused, sizeof(buf_focused), "%.6g", (double)*value);
@@ -780,7 +782,8 @@ void GUI_Float(GUI_Box box, float *value, float min, float max)
         snprintf(buf_default, sizeof(buf_default), "%.6g", (double)*value);
     }
     char *buf = is_focused ? buf_focused : buf_default;
-    GUI_Input(GUI_MakeBoxColor(shape_original, box.opt.colors), value, buf,
+
+    GUI_Input(box, value, buf,
         sizeof(buf_default) /* Intentionally not using buf */,
         EGUI_Input_Float);
 
@@ -797,10 +800,11 @@ void GUI_Float(GUI_Box box, float *value, float min, float max)
 // > CHECK
 void GUI_DrawCheck(
     GUI_Box box, bool value, const char *on_txt, const char *off_txt,
-    EGUI_ControlStatus status, EGUI_Font font)
+    EGUI_ControlStatus status)
 {
-    Rectangle shape = box.shape;
+    Rectangle       shape           = box.shape;
     GUI_State       *state          = GUI_CTX.state;
+    EGUI_Font       font            = box.opt.font;
     GUI_FontSetup   *font_setup     = GUI_GetFontSetup(font);
     GUI_Theme       *theme          = &GUI_CTX.setup->theme;
     GUI_ThemeColors theme_colors    = GUI_GetThemeColors(box.opt.colors);
@@ -851,12 +855,11 @@ void GUI_Check(
         }
     }
 
-    EGUI_Font font   = GUI_GetFont();
     EGUI_ControlStatus status =
         is_focused      ? EGUI_ControlStatus_Focused :
         is_cursor_over ? EGUI_ControlStatus_Collide :
                           EGUI_ControlStatus_Default;
-    GUI_DrawCheck(box, *value, on_txt, off_txt, status, font);
+    GUI_DrawCheck(box, *value, on_txt, off_txt, status);
 }
 // < END CHECK
 
