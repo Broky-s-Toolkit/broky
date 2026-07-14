@@ -1,6 +1,5 @@
 #pragma once
-#ifndef NON_EDITOR_BUILD
- #define NON_EDITOR_BUILD 0
+#ifndef IDE_SYNTAX_HL
  #include "__core.h"
 #endif
 
