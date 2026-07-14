@@ -59,6 +59,7 @@ int main(void) {
     game_state  = GAME_MakeState();
     win_state   = GAME_MakeWindowState();
     game_temp   = GAME_MakeTemp();
+    GAME_InitPhysics(&game_state);
     GAME_SetContext(&game_state, &win_state, &game_temp);
 
     // Game canvas
@@ -115,20 +116,29 @@ int main(void) {
         GUI_EndDraw();
         EndTextureMode();
 
-        //
-        // CHARACTERS
-        GAME_Character *player = GAME_GetCurrentCharacter();
-        Camera2D *camera = &game_state.camera2D;
-        camera->target = (Vector2) { player->shape.x, player->shape.y };
-        camera->offset = (Vector2){ GAME_RES_HALF_W,  GAME_RES_HALF_H };
-
         // GUI Actions
         GAME_Actions *player_actions = &GAME_CTX.temp->player_actions;
-        if (player_actions->reset_characters)   game_state = GAME_MakeState();
+        player_actions->toggle_character     |= IsKeyPressed(KEY_TAB);
+        player_actions->move_down             = IsKeyDown(KEY_DOWN);
+        player_actions->move_up               = IsKeyDown(KEY_UP);
+        player_actions->move_left             = IsKeyDown(KEY_LEFT);
+        player_actions->move_right            = IsKeyDown(KEY_RIGHT);
+
+        if (player_actions->reset_characters) {
+            GAME_DestroyPhysics(&game_state);
+            game_state = GAME_MakeState();
+            GAME_InitPhysics(&game_state);
+        }
         if (player_actions->add_character)      GAME_AddCharacter();
         if (player_actions->toggle_character)   GAME_UpdateNextCharacter();
         if (IsKeyPressed(KEY_F8))               gui_state.scale = FloatMin(6.0f, gui_state.scale + 0.25f);
         if (IsKeyPressed(KEY_F7))               gui_state.scale = FloatMax(0.5f, gui_state.scale - 0.25f);
+
+        //
+        // CHARACTERS
+        GAME_Character *player = GAME_GetCurrentCharacter();
+        Camera2D *camera = &game_state.camera2D;
+        camera->offset = (Vector2){ GAME_RES_HALF_W,  GAME_RES_HALF_H };
 
         if (GUI_IsCursorOverGui() == false) {
             // Update camera
@@ -137,14 +147,10 @@ int main(void) {
             else if (camera->zoom < 0.1f) camera->zoom = 0.1f;
         }
 
-        // Character keyboard
-        player_actions->toggle_character     |= IsKeyPressed(KEY_TAB);
-        player_actions->move_down             = IsKeyDown(KEY_DOWN);
-        player_actions->move_up               = IsKeyDown(KEY_UP);
-        player_actions->move_left             = IsKeyDown(KEY_LEFT);
-        player_actions->move_right            = IsKeyDown(KEY_RIGHT);
+        for (int i = 0; i < game_state.alive_characters; ++i) {
+            game_state.characters[i].movement = Vector2Zero();
+        }
 
-        // Update character
         Vector2 move = { 0.0f, 0.0f };
         if (player_actions->move_down)  move.y += 1;
         if (player_actions->move_up)    move.y -= 1;
@@ -152,14 +158,12 @@ int main(void) {
         if (player_actions->move_right) move.x += 1;
 
         float dt = GetFrameTime();
-
-        // Move
         player->movement    = move;
-        player->shape.x     += player->movement.x * CHARACTER_MAX_SPEED * 2 * dt;
-        player->shape.y     += player->movement.y * CHARACTER_MAX_SPEED * 2 * dt;
+        GAME_StepPhysics(&game_state, dt);
+        camera->target = RectCenter(player->shape);
 
         // Animate
-        float speed = FloatAbs(player->movement.x);
+        float speed = Vector2Length(player->movement);
         if (speed > 0.01f)
             player->anim_time   += dt * speed * 2;
         else
@@ -199,7 +203,6 @@ int main(void) {
                     DrawLineV(p3, p1, BLACK);
                 }
 
-                // TODO@dc: Move to update part
                 bool collisions[CHARACTERS];
                 float radius = 30.0f;
                 GAME_UpdateCollisions(collisions, radius);
@@ -209,9 +212,11 @@ int main(void) {
                     Vector2 center              = RectCenter(character->shape);
                     Color ring_color            = collisions[i] ? ColorAlpha(WHITE, 0.2)
                                                                 : ColorAlpha(WHITE, 0);
+                    Color box_color             = collisions[i] ? RED : BLACK;
                     float anim_phase            = character->anim_time * (character->movement.x < 0 ? 1.0f : -1.0f);
                     DrawRing(center, radius - 3, radius, 0, 360, 32, ring_color);
                     DrawCharacter(character->shape, character->movement, anim_phase, character->color);
+                    DrawRectangleLinesEx(character->shape, 1.0f, box_color);
                 }
             EndMode2D();
         EndTextureMode();
@@ -237,67 +242,13 @@ int main(void) {
                 /*DrawTexturePro(rain_buffer.texture, GetSourceRec(rain_buffer.texture), MoveAndExtendXY(window_limits, 0, 100), (Vector2){0,0}, 0.0, WHITE);*/
             }
 
-            // TODO@dc: paint each element and scale them separately instead of using this scale. Work here in plain scene coords, this way we can mix pixelperfect sprites (from textures) with the generated pixel characters in game_canvas.texture.
-            // TODO@dc: keep aspect ratio
-            // Scaled game screen
-            float scale_x = FloatCeil((float)GetScreenWidth() / GAME_RES_W);
-            float scale_y = FloatCeil((float)GetScreenHeight() / GAME_RES_H);
-            camera->target = (Vector2){ player->shape.x * scale_x, player->shape.y * scale_y};
-            camera->offset = (Vector2){ GAME_RES_HALF_W * scale_x,  GAME_RES_HALF_H  * scale_y};
-            BeginMode2D(*camera);
-                /*// Scene with paralax
-                {
-                    float parallax = 1.4f;
-
-                    static Texture2D arbol = {0};
-                    if (arbol.id == 0) arbol = LoadTexture(BROKY_ART_ROOT "/arbol.png");
-
-                    // Configuración
-                    int num_arboles = 10;         // cuantos arboles
-                    float separacion = 30 * scale_x; // distancia entre arboles
-                    Vector2 basePos = { 7 * scale_x, -50 * scale_y };
-
-                    // Calcular desplazamiento relativo a la cámara (efecto parallax)
-                    Vector2 camOffset = camera->target;
-                    Vector2 camAdjust = {
-                        (camOffset.x - camera->offset.x) * (1.0f - 1.0f/parallax),
-                        (camOffset.y - camera->offset.y) * (1.0f - 1.0f/parallax)
-                    };
-
-                    // --- Horizonte con mismo parallax que los árboles ---
-                    Color horizonColor = GRAY;
-                    Rectangle horizonRect = {
-                        -2000 * scale_x + camAdjust.x,  // desplazado según cámara
-                        20 * scale_y + camAdjust.y,   // posición vertical
-                        4000 * scale_x,                 // ancho grande
-                        300 * scale_y                   // altura
-                    };
-                    DrawRectangleRec(horizonRect, horizonColor);
-
-                    // Pintar varios árboles en línea horizontal
-                    for (int i = 0; i < num_arboles; i++)
-                    {
-                        Vector2 parallaxPos = {
-                            basePos.x + i * separacion + camAdjust.x,
-                            basePos.y + camAdjust.y
-                        };
-
-                        DrawTextureEx(arbol, parallaxPos, 0, scale_x, WHITE);
-                    }
-                }
-
-                static Texture2D casaena = {0};
-                if (casaena.id == 0) casaena = LoadTexture(BROKY_ART_ROOT "/casaena.png");
-                DrawTextureEx(casaena, (Vector2){ 10 * scale_x, -100 * scale_y }, 0, scale_x, WHITE);*/
-            EndMode2D();
-
-            /*DrawTexturePro(game_canvas.texture,
-                    (Rectangle){0, 0, GAME_RES_W, -GAME_RES_H},
-                    (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()},
-                    (Vector2){0, 0},
-                    0.0f,
-                    WHITE
-                );*/
+            DrawTexturePro(game_canvas.texture,
+                (Rectangle){ 0, 0, GAME_RES_W, -GAME_RES_H },
+                (Rectangle){ 0, 0, (float)GetScreenWidth(), (float)GetScreenHeight() },
+                (Vector2){ 0, 0 },
+                0.0f,
+                WHITE
+            );
 
             // Show UI Buffer
             DrawTextureRec(gui_state.buffer.texture, FlipYRec(GetSourceRec(gui_state.buffer.texture)), (Vector2){ 0, 0 }, WHITE);
@@ -312,6 +263,7 @@ int main(void) {
         EndDrawing();
     }
 
+    GAME_DestroyPhysics(&game_state);
     CloseWindow();
     return 0;
 }

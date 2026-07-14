@@ -1,5 +1,6 @@
 -I/home/dacanizares/source/broky/src
 -I/home/dacanizares/source/broky/lib
+-I/home/dacanizares/source/broky/lib/3rd/box2d/include
 -I/usr/local/include
 -I/usr/include/libpng16
 -I/usr/include/harfbuzz
@@ -8,4 +9,4 @@
 -I/usr/include/sysprof-6
 -DWITH_GZFILEOP
 -pthread
--std=c99
+-std=c17

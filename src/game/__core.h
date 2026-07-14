@@ -3,6 +3,7 @@
  #define NON_EDITOR_BUILD 0
  #include "gui/gui.h"
  #include "common.h"
+ #include "box2d/box2d.h"
 #endif
 
 //
@@ -35,6 +36,7 @@ Game_Element Game_MakeElement(const char *path, Vector2 position, float parallax
 
 #define CHARACTERS              4
 #define CHARACTER_MAX_SPEED     32
+#define GAME_PHYSICS_PIXELS_PER_METER 32.0f
 
 typedef struct {
     bool reset_characters;
@@ -57,12 +59,16 @@ typedef struct  {
     Color color;
     Vector2 movement;
     float anim_time;
+    b2BodyId body_id;
+    bool colliding;
 } GAME_Character;
 
 typedef struct {
     int             current_character;
     int             alive_characters;
     Camera2D        camera2D;
+    b2WorldId       physics_world_id;
+    float           physics_accumulator;
     GAME_Character  characters[CHARACTERS];
 } GAME_State;
 
@@ -77,11 +83,13 @@ GAME_State GAME_MakeState(void)
             .rotation = 0.0f,
             .zoom     = 1.0f
         },
+        .physics_world_id = b2_nullWorldId,
+        .physics_accumulator = 0.0f,
         .characters = {
-            (GAME_Character){  0,  0, 10, 20, RED,    Vector2Zero(), 0 },
-            (GAME_Character){ 10, 30, 10, 20, BLUE,   Vector2Zero(), 0 },
-            (GAME_Character){ 50, 60, 10, 20, GREEN,  Vector2Zero(), 0 },
-            (GAME_Character){ 80, 60, 10, 20, ORANGE, Vector2Zero(), 0 },
+            (GAME_Character){ .shape = {  0,  0, 10, 20 }, .color = RED,    .movement = { 0 }, .anim_time = 0.0f, .body_id = b2_nullBodyId, .colliding = false },
+            (GAME_Character){ .shape = { 10, 30, 10, 20 }, .color = BLUE,   .movement = { 0 }, .anim_time = 0.0f, .body_id = b2_nullBodyId, .colliding = false },
+            (GAME_Character){ .shape = { 50, 60, 10, 20 }, .color = GREEN,  .movement = { 0 }, .anim_time = 0.0f, .body_id = b2_nullBodyId, .colliding = false },
+            (GAME_Character){ .shape = { 80, 60, 10, 20 }, .color = ORANGE, .movement = { 0 }, .anim_time = 0.0f, .body_id = b2_nullBodyId, .colliding = false },
         }
     };
 
@@ -160,8 +168,23 @@ void GAME_UpdateNextCharacter()
 void GAME_AddCharacter()
 {
     GAME_State* state   = GAME_CTX.state;
+    if (state->alive_characters >= CHARACTERS) {
+        return;
+    }
+
+    int next_index = state->alive_characters;
+    GAME_Character *character = &state->characters[next_index];
+    if (B2_IS_NON_NULL(character->body_id)) {
+        Vector2 center = RectCenter(character->shape);
+        b2Body_Enable(character->body_id);
+        b2Body_SetTransform(character->body_id, (b2Pos){
+            center.x / GAME_PHYSICS_PIXELS_PER_METER,
+            center.y / GAME_PHYSICS_PIXELS_PER_METER
+        }, b2MakeRot(0.0f));
+        b2Body_SetLinearVelocity(character->body_id, (b2Vec2){ 0.0f, 0.0f });
+    }
+
     state->alive_characters++;
-    if (state->alive_characters > CHARACTERS) state->alive_characters = CHARACTERS;
 }
 
 GAME_Character* GAME_GetCurrentCharacter()
@@ -172,6 +195,10 @@ GAME_Character* GAME_GetCurrentCharacter()
 
 bool GAME_CheckRingCollision(GAME_Character* character1, GAME_Character* character2, float radius)
 {
+    if (character1->colliding && character2->colliding) {
+        return true;
+    }
+
     Vector2 center1     = RectCenter(character1->shape);
     Vector2 center2     = RectCenter(character2->shape);
     float distance      = Vector2Distance(center1, center2);
@@ -181,17 +208,9 @@ bool GAME_CheckRingCollision(GAME_Character* character1, GAME_Character* charact
 void GAME_UpdateCollisions(bool collisions[], float radius)
 {
     GAME_State* state   = GAME_CTX.state;
+    (void)radius;
     for (int i = 0; i < CHARACTERS; i++) {
-        collisions[i] = false;
-    }
-
-    for (int i = 0; i < state->alive_characters; ++i) {
-        for (int j = i + 1; j < state->alive_characters; ++j) {
-            if (GAME_CheckRingCollision(&state->characters[i], &state->characters[j], radius)) {
-                collisions[i] = true;
-                collisions[j] = true;
-            }
-        }
+        collisions[i] = state->characters[i].colliding;
     }
 }
 #endif
