@@ -1,3 +1,6 @@
 [submodule "art/broky"]
 	path = art/broky
 	url = https://github.com/Broky-s-Toolkit/art.git
+[submodule "lib/3rd/box2d"]
+	path = lib/3rd/box2d
+	url = https://github.com/erincatto/box2d.git
