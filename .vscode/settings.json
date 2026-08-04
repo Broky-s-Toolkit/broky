@@ -420,6 +420,44 @@
         "settings": {
           "foreground": "#DC7C57"
         }
+      },
+      {
+        "scope": "punctuation.terminator.statement.cpp",
+        "settings": {
+          "foreground": "#AAAEB3"
+        }
+      },
+      {
+        "scope": [
+          "punctuation.definition.begin.bracket.square",
+          "punctuation.definition.end.bracket.square",
+          "punctuation.definition.begin.bracket.square.cpp",
+          "punctuation.definition.end.bracket.square.cpp"
+        ],
+        "settings": {
+          "foreground": "#DC7C57"
+        }
+      },
+      {
+        "scope": "variable.other.property.cpp",
+        "settings": {
+          "foreground": "#9b9696"
+        }
+      },
+      {
+        "scope": "punctuation.separator.dot-access.cpp",
+        "settings": {
+          "foreground": "#DC7C57"
+        }
+      },
+      {
+        "scope": [
+          "punctuation.section.arguments.begin.bracket.round.operator.sizeof.cpp",
+          "punctuation.section.arguments.end.bracket.round.operator.sizeof.cpp"
+        ],
+        "settings": {
+          "foreground": "#DC7C57"
+        }
       }
     ]
   },
@@ -435,6 +473,7 @@
       "variable": "#aaaeb3",
       "parameter": "#aaaeb3",
       "property": "#aaaeb3",
+      "property.classScope": "#9b9696",
       "function": "#ead9a0",
       "method": "#ead9a0",
       "macro": "#579bd5",
@@ -463,18 +502,18 @@
     "editor.background": "#1d191e",
     "editorGutter.background": "#1d191e",
     "editor.lineHighlightBorder": "#00000000",
-    "editorGroup.border": "#00000000",
+    "editorGroup.border": "#2c2c2d",
     "editorGroup.dropBackground": "#00000000",
-    "editorGroupHeader.border": "#00000000",
+    "editorGroupHeader.border": "#2a2b2c",
     "tab.activeBackground": "#1d2940",
-    "tab.inactiveBackground": "#151216",
+    "tab.inactiveBackground": "#171618",
     "tab.activeForeground": "#d7dde7",
     "tab.inactiveForeground": "#a6adb8",
     "tab.hoverBackground": "#26282c",
     "tab.hoverForeground": "#ced0d6",
     "tab.unfocusedActiveBackground": "#1d2940",
-    "tab.unfocusedInactiveBackground": "#151216",
-    "tab.border": "#3a3d42",
+    "tab.unfocusedInactiveBackground": "#171618",
+    "tab.border": "#2c2c2d",
     "tab.activeBorder": "#5a83c7",
     "tab.activeBorderTop": "#5a83c7",
     "tab.unfocusedActiveBorder": "#3a3d42",
@@ -482,10 +521,10 @@
     "tab.lastPinnedBorder": "#00000000",
     "editorGroupHeader.tabsBackground": "#161719",
     "editorGroupHeader.noTabsBackground": "#161719",
-    "editorGroupHeader.tabsBorder": "#3a3d42",
-    "sideBar.background": "#26282c",
+    "editorGroupHeader.tabsBorder": "#2a2b2c",
+    "sideBar.background": "#1d1c1e",
     "sideBar.foreground": "#bcbec4",
-    "sideBar.border": "#3d3e3f",
+    "sideBar.border": "#2a2b2c",
     "sideBarTitle.background": "#171418",
     "sideBarSectionHeader.background": "#1a161b",
     "sideBarSectionHeader.border": "#00000000",
@@ -498,11 +537,12 @@
     "list.focusBackground": "#2a4371",
     "list.focusForeground": "#d7dde7",
     "panel.background": "#1d191e",
-    "panel.border": "#00000000",
-    "panelTitle.activeBorder": "#00000000",
+    "panel.border": "#2a2b2c",
+    "terminal.background": "#171618",
+    "panelTitle.activeBorder": "#2c2c2d",
     "panelTitle.inactiveForeground": "#8d9199",
     "panelTitle.activeForeground": "#bcbec4",
-    "panelSection.border": "#00000000",
+    "panelSection.border": "#2c2c2d",
     "panelSectionHeader.border": "#00000000",
     "activityBar.background": "#26282c",
     "activityBar.foreground": "#8d9199",
@@ -513,12 +553,12 @@
     "input.border": "#2b2d30",
     "input.background": "#1d191e",
     "inputOption.activeBorder": "#393b40",
-    "statusBar.background": "#1d191e",
+    "statusBar.background": "#171618",
     "statusBar.foreground": "#8d9199",
-    "statusBar.border": "#00000000",
-    "titleBar.activeBackground": "#1a161b",
+    "statusBar.border": "#2a2b2c",
+    "titleBar.activeBackground": "#171618",
     "titleBar.activeForeground": "#bcbec4",
-    "titleBar.inactiveBackground": "#1a161b",
+    "titleBar.inactiveBackground": "#171618",
     "titleBar.inactiveForeground": "#8d9199",
     "titleBar.border": "#00000000",
     "sash.hoverBorder": "#00000000"
