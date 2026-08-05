@@ -1,0 +1,22 @@
+{
+  "name": "broky-syntax",
+  "displayName": "Broky Syntax",
+  "description": "Syntax highlighting colors for Broky C and C++ projects.",
+  "version": "0.0.1",
+  "publisher": "broky",
+  "engines": {
+    "vscode": ">=1.80.0"
+  },
+  "categories": [
+    "Themes"
+  ],
+  "contributes": {
+    "themes": [
+      {
+        "label": "Broky Syntax",
+        "uiTheme": "vs-dark",
+        "path": "./themes/broky-syntax-color-theme.json"
+      }
+    ]
+  }
+}
