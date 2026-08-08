@@ -1,9 +1,5 @@
 #pragma once
-#ifndef IDE_SYNTAX_HL
- #define IDE_SYNTAX_HL 1
- #define IMPLEMENT_ALL
- #include "global.h"
-#endif
+#include "global.h"
 
 
 #define GUI_MAX_TRAIL       30
@@ -217,49 +213,6 @@ EGUI_Font           GUI_GetFont(void);
 EGUI_ThemeColor     GUI_GetThemeColor(void);
 GUI_ThemeColors     GUI_GetThemeColors(EGUI_ThemeColor color);
 
-#ifdef IMPLEMENT_ALL
-GUI_Box GUI_MakeBox(Rectangle shape)
-{
-    GUI_Box box = {
-        .shape      = shape,
-        .opt        = (GUI_Opt) {
-            .font   = GUI_GetFont(),
-            .colors = GUI_GetThemeColor()
-        }
-    };
-    return box;
-}
-
-GUI_Box GUI_MakeBoxColor(Rectangle shape, EGUI_ThemeColor color)
-{
-    GUI_Box box = {
-        .shape      = shape,
-        .opt        = (GUI_Opt) {
-            .font   = GUI_GetFont(),
-            .colors = color
-        }
-    };
-    return box;
-}
-
-GUI_Box GUI_MakeBoxEx(Rectangle shape, GUI_Opt opt)
-{
-    GUI_Box box = {
-        .shape      = shape,
-        .opt        = opt
-    };
-    return box;
-}
-
-GUI_Pin GUI_MakePin(Vector2 position, float height)
-{
-    GUI_Pin pin = {
-        .position   = position,
-        .height     = height
-    };
-    return pin;
-}
-#endif
 // < END SUBMODULE: CONTROLS
 
 // > TYPES
@@ -334,23 +287,6 @@ typedef struct {
 
 const GUI_MenuItem *GUI_MenuItemGetSelected(GUI_MenuItems *items);
 
-#ifdef IMPLEMENT_ALL
-const GUI_MenuItem *GUI_MenuItemGetSelected(GUI_MenuItems *items)
-{
-    Assert(items != NULL);
-    Assert(items->selected_value != NULL);
-    Assert(items->count > 0);
-    Assert(items->elements != NULL);
-
-    for (int i = 0; i < items->count; i++) {
-        if (items->elements[i].value == *items->selected_value) {
-            return &items->elements[i];
-        }
-    }
-
-    return &items->elements[0];
-}
-#endif
 
 typedef struct {
     const void      *id_ptr;            // Control Owner. A unique pointer representing the control owner
@@ -396,11 +332,13 @@ typedef struct {
 
 
 // > STATE CONTEXT
-static struct {
+typedef struct {
     GUI_State*  state;
     GUI_Setup*  setup;
     GUI_Temp*   temp;
-} GUI_CTX = { 0 };
+} GUI_Context;
+
+extern GUI_Context GUI_CTX;
 
 
 // > FUNCTIONS
@@ -435,89 +373,3 @@ bool            GUI_OverlayIsDrawing(void);
 GUI_Window*     GUI_GetWindow(int id);
 // < FROM _SUBMODULES
 
-// > CONTROL HELPERS
-bool GUI_CheckCollisionCursorControl(Rectangle shape, GUI_Window *window)
-{
-    GUI_State *state    = GUI_CTX.state;
-    Vector2 cursor      = GUI_CTX.temp->cursor_current;
-
-    // Overlay
-    if (GUI_OverlayIsDrawing()) {
-        return CheckCollisionPointRec(cursor, shape);
-    } else if (GUI_IsCursorOverOverlay()) {
-        return false;
-    }
-
-    // Outside a window
-    int focused_window_id   = state->z_index[0];
-    bool outside_window     = window == NULL || focused_window_id == GUI_NO_WIN;
-    if (outside_window) {
-        return CheckCollisionPointRec(cursor, shape);
-    }
-
-    // Inside a window
-    Assert(window != NULL);
-    bool current_target = GUI_IsCurrentWindowTarget(window->id);
-    if (current_target == false) {
-        return false;
-    }
-    // Window
-    bool collide_window     = CheckCollisionPointRec(cursor, window->shape);
-    bool collide_control    = CheckCollisionPointRec(cursor, shape);
-    bool collide_workspace  = CheckCollisionPointRec(cursor, window->workspace);
-    bool overflow           = GUI_CTX.temp->grid.force_overflow;
-    bool collide                = collide_control && (collide_workspace || overflow);
-    bool result                 = collide && (focused_window_id == window->id || !collide_window);
-    return result;
-}
-
-bool GUI_CheckCollisionCursorControlWin(Rectangle shape)
-{
-    GUI_Window *window  = GUI_GetWindow(GUI_CTX.temp->window_current_id);
-    bool collide        = GUI_CheckCollisionCursorControl(shape, window);
-    return collide;
-}
-
-Rectangle GUI_ControlShapeCut(Rectangle shape, float border, float scale, bool intersect_window) {
-    Rectangle result = AddRect(shape, border * scale, border * scale, -border * scale * 2, -border * scale * 2);
-    //TODO@dc: result.y += GUI_CTX.temp->grid.current_scroll;
-
-    int window_id = GUI_CTX.temp->window_current_id;
-    if (intersect_window && window_id != GUI_NO_WIN) {
-        GUI_Window *window          = GUI_GetWindow(window_id);
-        Rectangle intersection      = RectIntersection(result, window->workspace);
-#if DEV_DEBUG_GUI_SCROLL == 1
-        if (GUI_CTX.temp->window_current_id == GUI_CTX.state->z_index[0]) {
-            GUI_DrawBorders(window->workspace, RED, RED, 1, false);
-            DrawDebugRect(result, ColorAlpha(GREEN, 0.1f));
-            DrawDebugRect(intersection, ColorAlpha(ORANGE, 0.9f));
-        }
-#endif
-        result = intersection;
-    }
-    return result;
-}
-
-void GUI_BeginControlScissor(void)
-{
-    bool not_overflow   = GUI_CTX.temp->grid.force_overflow == false;
-    int window_id       = GUI_CTX.temp->window_current_id;
-    bool inside_window  = window_id != GUI_NO_WIN;
-    if (not_overflow && inside_window) {
-        GUI_Window *window = GUI_GetWindow(window_id);
-        if (window == NULL) {
-            return;
-        }
-        BeginScissorModeRect(window->workspace);
-    }
-}
-
-// Cut text not only by window but by the control itself
-// Useful to cut text inside a control
-void GUI_BeginInnerControlScissor(Rectangle shape, float border, float scale)
-{
-    bool not_overflow   = GUI_CTX.temp->grid.force_overflow == false;
-    bool inside_window  = GUI_CTX.temp->window_current_id != GUI_NO_WIN;
-    BeginScissorModeRect(GUI_ControlShapeCut(shape, border, scale, inside_window && not_overflow));
-}
-// < END CONTROL HELPERS
