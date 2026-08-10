@@ -32,4 +32,3 @@ Rectangle       GUI_GetWindowPanel(Rectangle shape);
 Rectangle       GUI_GetWindowBottom(Rectangle shape);
 void            GUI_WindowUpdateShapeForContent(GUI_Window *window);
 
-// > IMPLEMENTATION

@@ -17,4 +17,3 @@ bool            GUI_OverlayIsDrawing(void);
 void            GUI_BeginOverlay(bool force_overflow, bool restore_grid);
 void            GUI_EndOverlay(Rectangle final_shape);
 
-// > IMPLEMENTATION

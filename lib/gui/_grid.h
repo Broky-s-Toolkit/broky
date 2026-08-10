@@ -35,4 +35,3 @@ void            GUI_GridAutoJump(void);
 Rectangle       GUI_GridAvailable(Rectangle workspace);
 Rectangle       GUI_GridApplyScroll(Rectangle shape);
 
-// > IMPLEMENTATION

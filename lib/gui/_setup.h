@@ -41,4 +41,3 @@ float               GUI_GetIconSmallWidth(void);
 // > COMMON
 GUI_Setup           GUI_LoadSetupDefault(void);
 
-// > IMPLEMENTATION

@@ -41,4 +41,3 @@ void GUI_DrawCheck(GUI_Box box, bool value, const char *on_txt, const char *off_
 void GUI_Check(GUI_Box box, bool *value, const char *on_txt, const char *off_txt);
 
 
-// > IMPLEMENTATION
