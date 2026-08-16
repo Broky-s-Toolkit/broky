@@ -6,6 +6,7 @@
 #include "gui/gui.h"
 #include "game/main.h"
 #include "labs/lab.h"
+#include "labs/sprites-paralax.h"
 
 #define GAME_RES_W          320
 #define GAME_RES_H          240
@@ -61,6 +62,8 @@ int main(void) {
     game_temp   = GAME_MakeTemp();
     GAME_InitPhysics(&game_state);
     GAME_SetContext(&game_state, &win_state, &game_temp);
+
+    SpritesParallaxLab sprites_parallax = SpritesParallaxLoad();
 
     // Game canvas
     RenderTexture2D game_canvas = LoadRenderTexture(GAME_RES_W, GAME_RES_H);
@@ -158,6 +161,7 @@ int main(void) {
         if (player_actions->move_right) move.x += 1;
 
         float dt = GetFrameTime();
+        SpritesParallaxUpdate(&sprites_parallax, dt);
         player->movement    = move;
         GAME_StepPhysics(&game_state, dt);
         camera->target = RectCenter(player->shape);
@@ -178,30 +182,7 @@ int main(void) {
 
             // Game world
             BeginMode2D(*camera);
-                {
-                    // Parallax factor: >1.0 = más cerca (se mueve más rápido), <1.0 = más lejos
-                    float parallax = 1.2f;
-
-                    // Posiciones base
-                    Vector2 p1 = {100, 250};
-                    Vector2 p2 = {160, 180};
-                    Vector2 p3 = {220, 250};
-
-                    // Ajustar con respecto a la cámara para simular profundidad
-                    Vector2 camOffset = camera->target;
-                    p1.x += (camOffset.x - camera->offset.x) * (1.0f - 1.0f/parallax);
-                    p2.x += (camOffset.x - camera->offset.x) * (1.0f - 1.0f/parallax);
-                    p3.x += (camOffset.x - camera->offset.x) * (1.0f - 1.0f/parallax);
-
-                    p1.y += (camOffset.y - camera->offset.y) * (1.0f - 1.0f/parallax);
-                    p2.y += (camOffset.y - camera->offset.y) * (1.0f - 1.0f/parallax);
-                    p3.y += (camOffset.y - camera->offset.y) * (1.0f - 1.0f/parallax);
-
-                    // Dibujo con efecto "más cercano"
-                    DrawLineV(p1, p2, BLACK);
-                    DrawLineV(p2, p3, BLACK);
-                    DrawLineV(p3, p1, BLACK);
-                }
+                SpritesParallaxDraw(&sprites_parallax, camera);
 
                 bool collisions[CHARACTERS];
                 float radius = 30.0f;
@@ -264,6 +245,7 @@ int main(void) {
     }
 
     GAME_DestroyPhysics(&game_state);
+    SpritesParallaxUnload(&sprites_parallax);
     CloseWindow();
     return 0;
 }
