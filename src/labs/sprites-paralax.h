@@ -5,7 +5,7 @@
  #include "../common.h"
 #endif
 
-#define SPRITES_PARALLAX_ASSET_ROOT ART_ROOT "/Octahedron/Sprites/Environment"
+#define SPRITES_PARALLAX_ASSET_ROOT BROKY_ART_ROOT "/spr/forest-sample"
 
 typedef struct {
     Texture2D mountain;
