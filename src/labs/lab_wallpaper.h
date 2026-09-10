@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef NON_EDITOR_BUILD
  #define NON_EDITOR_BUILD 0
  #include "../common.h"
@@ -11,12 +13,14 @@
 #endif
 
 typedef struct {
-    int w, h;
-    int variant;      // 0: island, 1: portal, 2: nebula
-    uint32_t seed;    // for deterministic stars
-    bool only_stars;
+    int             w;
+    int             h;
+    int             variant;      // 0: island, 1: portal, 2: nebula
+    uint32_t        seed;         // for deterministic stars
+    bool            only_stars;
+    float           time;
     RenderTexture2D rt;
-} Wallpaper;
+} WallpaperLab;
 
 // ---------- Palette (subset from your list; añade si quieres) ----------
 static inline Color Hex(uint32_t x){
@@ -156,36 +160,39 @@ static void Portal(float t){
 }
 
 // ---------- API ----------
-Wallpaper Make_Wallpaper(int variant, uint32_t seed, bool only_stars)
+static WallpaperLab WallpaperLabLoad(int variant, uint32_t seed, bool only_stars)
 {
-    Wallpaper wp = {
+    WallpaperLab lab = {
         .w          = WALLPAPER_LOGICAL_W,
-        .h          = WALLPAPER_LOGICAL_W,
+        .h          = WALLPAPER_LOGICAL_H,
         .variant    = variant,
         .seed       = seed ? seed : 0xC0FFEEu,
-        .only_stars = only_stars
+        .only_stars = only_stars,
+        .time       = 0.0f
     };
-    wp.rt = LoadRenderTexture(wp.w, wp.h);
+    lab.rt = LoadRenderTexture(lab.w, lab.h);
     // VERY IMPORTANT for crisp upscaling
-    SetTextureFilter(wp.rt.texture, TEXTURE_FILTER_POINT);
-    return wp;
+    SetTextureFilter(lab.rt.texture, TEXTURE_FILTER_POINT);
+    return lab;
 }
 
-void WallpaperUnload(Wallpaper *wp)
+static void WallpaperLabUnload(WallpaperLab *lab)
 {
-    if(wp->rt.id) UnloadRenderTexture(wp->rt);
-    *wp = (Wallpaper){0};
+    if (lab->rt.id) UnloadRenderTexture(lab->rt);
+    *lab = (WallpaperLab){ 0 };
 }
 
-void WallpaperUpdate(Wallpaper *wp, float t)
+static void WallpaperLabUpdate(WallpaperLab *lab, float dt)
 {
-    BeginTextureMode(wp->rt);
-        if (wp->only_stars) {
-            Starfield(wp->seed, t, 3);
+    lab->time += dt;
+
+    BeginTextureMode(lab->rt);
+        if (lab->only_stars) {
+            Starfield(lab->seed, lab->time, 3);
         } else {
             // Background gradient (vertical)
-            for(int y=0;y<wp->h;y++){
-                float u = (float)y/(float)(wp->h-1);
+            for(int y=0;y<lab->h;y++){
+                float u = (float)y/(float)(lab->h-1);
                 // night blue to violet
                 Color a = C(P1), b = C(11);
                 Color c = (Color){
@@ -194,16 +201,16 @@ void WallpaperUpdate(Wallpaper *wp, float t)
                     (unsigned char)(a.b + (b.b-a.b)*u),
                     255
                 };
-                DrawRectangle(0,y,wp->w,1,c);
+                DrawRectangle(0,y,lab->w,1,c);
             }
-            Starfield(wp->seed, t, 3);
-            NebulaBands(t);
+            Starfield(lab->seed, lab->time, 3);
+            NebulaBands(lab->time);
 
-            if(wp->variant==0){        // island + subtle portal behind
-                Portal(t*0.6f);
+            if(lab->variant==0){        // island + subtle portal behind
+                Portal(lab->time*0.6f);
                 FloatingIsland();
-            } else if(wp->variant==1){ // portal focus
-                Portal(t);
+            } else if(lab->variant==1){ // portal focus
+                Portal(lab->time);
             } else {                   // dense nebula only
                 // add extra wisps
                 for(int i=0;i<6;i++){
@@ -216,19 +223,20 @@ void WallpaperUpdate(Wallpaper *wp, float t)
     EndTextureMode();
 }
 
-void WallpaperDraw(Wallpaper *wp, int screenW, int screenH)
+static void WallpaperLabDraw(const WallpaperLab *lab, int screen_width, int screen_height)
 {
     // compute integer scale for pixel-perfect
-    int scaleX = screenW / wp->w;
-    int scaleY = screenH / wp->h;
-    int scale  = (scaleX<scaleY? scaleX: scaleY);
-    if(scale<1) scale = 1;
-    int outW = wp->w * scale;
-    int outH = wp->h * scale;
-    int ox = (screenW - outW)/2;
-    int oy = (screenH - outH)/2;
+    int scale_x = screen_width / lab->w;
+    int scale_y = screen_height / lab->h;
+    int scale   = scale_x < scale_y ? scale_x : scale_y;
+    if (scale < 1) scale = 1;
 
-    Rectangle src = {0,0,(float)wp->w, -(float)wp->h}; // flip Y
-    Rectangle dst = {(float)ox,(float)oy,(float)outW,(float)outH};
-    DrawTexturePro(wp->rt.texture, src, dst, (Vector2){0,0}, 0.0f, WHITE);
+    int out_w = lab->w * scale;
+    int out_h = lab->h * scale;
+    int x     = (screen_width - out_w) / 2;
+    int y     = (screen_height - out_h) / 2;
+
+    Rectangle source      = { 0, 0, (float)lab->w, -(float)lab->h }; // flip Y
+    Rectangle destination = { (float)x, (float)y, (float)out_w, (float)out_h };
+    DrawTexturePro(lab->rt.texture, source, destination, (Vector2){ 0, 0 }, 0.0f, WHITE);
 }

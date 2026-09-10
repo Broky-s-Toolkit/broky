@@ -5,8 +5,8 @@
 #include "common.h"
 #include "gui/gui.h"
 #include "game/main.h"
+#include "labs/lab_utils.h"
 #include "labs/lab.h"
-#include "labs/sprites-paralax.h"
 
 #define GAME_RES_W          320
 #define GAME_RES_H          240
@@ -53,17 +53,17 @@ int main(void) {
     GUI_SetContext(&gui_state, &gui_setup, &gui_temp);
 
     // PREPARE GAME
-    static GAME_State game_state;
+    static GAME_State       game_state;
     static GAME_WindowState win_state;
-    static GAME_Temp game_temp;
+    static GAME_Temp        game_temp;
+    static Labs             labs;
 
     game_state  = GAME_MakeState();
     win_state   = GAME_MakeWindowState();
     game_temp   = GAME_MakeTemp();
     GAME_InitPhysics(&game_state);
     GAME_SetContext(&game_state, &win_state, &game_temp);
-
-    SpritesParallaxLab sprites_parallax = SpritesParallaxLoad();
+    Labs_Init(&labs);
 
     // Game canvas
     RenderTexture2D game_canvas = LoadRenderTexture(GAME_RES_W, GAME_RES_H);
@@ -161,7 +161,7 @@ int main(void) {
         if (player_actions->move_right) move.x += 1;
 
         float dt = GetFrameTime();
-        SpritesParallaxUpdate(&sprites_parallax, dt);
+        Labs_Update(&labs, dt);
         player->movement    = move;
         GAME_StepPhysics(&game_state, dt);
         camera->target = RectCenter(player->shape);
@@ -177,13 +177,18 @@ int main(void) {
         //
         // RENDER
         //
+        LabDrawContext lab_context = {
+            .camera = camera,
+            .width  = GAME_RES_W,
+            .height = GAME_RES_H
+        };
+
         BeginTextureMode(game_canvas);
             ClearBackground(BLANK);
+            Labs_Draw(&labs, &lab_context);
 
             // Game world
             BeginMode2D(*camera);
-                SpritesParallaxDraw(&sprites_parallax, camera);
-
                 bool collisions[CHARACTERS];
                 float radius = 30.0f;
                 GAME_UpdateCollisions(collisions, radius);
@@ -245,7 +250,7 @@ int main(void) {
     }
 
     GAME_DestroyPhysics(&game_state);
-    SpritesParallaxUnload(&sprites_parallax);
+    Labs_Unload(&labs);
     CloseWindow();
     return 0;
 }
