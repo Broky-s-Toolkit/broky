@@ -29,7 +29,8 @@ GUI_State GUI_MakeStateDefault(Vector2 screen_max)
     GUI_State state = {
         .buffer         = LoadRenderTexture((int)screen_max.x, (int)screen_max.y),
         .scale          = 1.0f,
-        .force_z_index  = 0
+        .force_z_index  = 0,
+        .gamepad_navigation = true
     };
 
     // IMPORTANT: keep GUI buffer pixel-perfect
@@ -151,6 +152,13 @@ bool GUI_IsCursorOverOverlay(void)
     bool is_cursor_over = CheckCollisionPointRec(cursor, shape);
     return is_cursor_over;
 }
+
+bool GUI_WantsKeyboard(void)
+{
+    return GUI_CTX.temp->control_focus_ptr != NULL
+        || GUI_CTX.state->navigation_focus != 0
+        || GUI_CTX.temp->overlay.id_ptr != NULL;
+}
 // < CURSOR
 
 // > FRAME PIPELINE
@@ -163,6 +171,42 @@ void GUI_BeginDraw(EGUI_Cursor cursor_style)
     GUI_CTX.temp->cursor_over_gui   = false;
     GUI_CTX.temp->pointer_press_consumed = false;
     GUI_CTX.temp->cursor_current    = LimitVector2Rect(GetMousePosition(), GetScreenRect());
+    GUI_CTX.temp->nav_count         = 0;
+
+    float nav_x = 0.0f;
+    float nav_y = 0.0f;
+    if (IsKeyPressed(KEY_TAB)) nav_x = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT) ? -1.0f : 1.0f;
+    if (GUI_CTX.state->navigation_focus != 0) {
+        if (IsKeyPressed(KEY_LEFT))  nav_x = -1.0f;
+        if (IsKeyPressed(KEY_RIGHT)) nav_x = 1.0f;
+        if (IsKeyPressed(KEY_UP))    nav_y = -1.0f;
+        if (IsKeyPressed(KEY_DOWN))  nav_y = 1.0f;
+    }
+    if (GUI_CTX.state->gamepad_navigation && IsGamepadAvailable(0)) {
+        if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT))  nav_x = -1.0f;
+        if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT)) nav_x = 1.0f;
+        if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_UP))    nav_y = -1.0f;
+        if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN))  nav_y = 1.0f;
+
+        float axis_x = GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X);
+        float axis_y = GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y);
+        if (fabsf(axis_x) > 0.65f && !GUI_CTX.state->nav_axis_x_held) nav_x = axis_x < 0 ? -1.0f : 1.0f;
+        if (fabsf(axis_y) > 0.65f && !GUI_CTX.state->nav_axis_y_held) nav_y = axis_y < 0 ? -1.0f : 1.0f;
+        GUI_CTX.state->nav_axis_x_held = fabsf(axis_x) > 0.35f;
+        GUI_CTX.state->nav_axis_y_held = fabsf(axis_y) > 0.35f;
+    }
+    if (nav_x != 0.0f || nav_y != 0.0f) {
+        GUI_CTX.state->navigation_focus = GUI_NavFind(
+            GUI_CTX.state->nav_items, GUI_CTX.state->nav_count,
+            GUI_CTX.state->navigation_focus, nav_x, nav_y);
+        GUI_CTX.temp->control_focus_ptr = NULL;
+    }
+    if (IsKeyPressed(KEY_ESCAPE)
+        || (GUI_CTX.state->gamepad_navigation && IsGamepadAvailable(0)
+            && IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT))) {
+        if (GUI_CTX.temp->overlay.id_ptr != NULL) GUI_OverlayClose();
+        else GUI_ClearFocus();
+    }
 
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         GUI_Overlay *overlay = &GUI_CTX.temp->overlay;
@@ -190,6 +234,26 @@ void GUI_EndDraw(void)
 
     Assert(GUI_CTX.temp->status == EGUI_Status_Drawing);
     GUI_CTX.temp->status = EGUI_Status_Ready;
+    GUI_CTX.state->nav_count = GUI_CTX.temp->nav_count;
+    memcpy(GUI_CTX.state->nav_items, GUI_CTX.temp->nav_items,
+        (size_t)GUI_CTX.temp->nav_count * sizeof(GUI_CTX.temp->nav_items[0]));
+}
+
+void GUI_SetGamepadNavigationEnabled(bool enabled)
+{
+    GUI_CTX.state->gamepad_navigation = enabled;
+}
+
+void GUI_SetTextInputHook(void (*hook)(void *owner, Rectangle shape))
+{
+    GUI_CTX.state->text_input_hook = hook;
+}
+
+void GUI_ClearFocus(void)
+{
+    GUI_CTX.temp->control_focus_ptr = NULL;
+    GUI_CTX.state->navigation_focus = 0;
+    GUI_CTX.state->active_control = 0;
 }
 // < FRAME PIPELINE
 #endif

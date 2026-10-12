@@ -121,11 +121,13 @@ int main(void) {
 
         // GUI Actions
         GAME_Actions *player_actions = &GAME_CTX.temp->player_actions;
-        player_actions->toggle_character     |= IsKeyPressed(KEY_TAB);
-        player_actions->move_down             = IsKeyDown(KEY_DOWN);
-        player_actions->move_up               = IsKeyDown(KEY_UP);
-        player_actions->move_left             = IsKeyDown(KEY_LEFT);
-        player_actions->move_right            = IsKeyDown(KEY_RIGHT);
+        if (!GUI_WantsKeyboard()) {
+            player_actions->toggle_character |= IsKeyPressed(KEY_TAB);
+            player_actions->move_down         = IsKeyDown(KEY_DOWN);
+            player_actions->move_up           = IsKeyDown(KEY_UP);
+            player_actions->move_left         = IsKeyDown(KEY_LEFT);
+            player_actions->move_right        = IsKeyDown(KEY_RIGHT);
+        }
 
         if (player_actions->reset_characters) {
             GAME_DestroyPhysics(&game_state);
