@@ -252,7 +252,7 @@ Rectangle GUI_GridNextXn(int n)
     Rectangle result = {
         .x      = first.x,
         .y      = first.y,
-        .width  = first.width + last.width,
+        .width  = last.x + last.width - first.x,
         .height = first.height
     };
     return result;
@@ -273,7 +273,7 @@ Rectangle GUI_GridNextYn(int n)
         .x      = first.x,
         .y      = first.y,
         .width  = first.width,
-        .height = first.height + last.height
+        .height = last.y + last.height - first.y
     };
     return result;
 }
@@ -299,6 +299,9 @@ Rectangle GUI_GridAvailable(Rectangle workspace)
         .height = workspace.height - used_h
     };
 
+    if (result.width < 0.0f) result.width = 0.0f;
+    if (result.height < 0.0f) result.height = 0.0f;
+
     // Vertical scroll
     if (result.height < GUI_CTX.temp->grid.vertical_size)
         result.height = GUI_CTX.temp->grid.vertical_size;
@@ -309,7 +312,7 @@ Rectangle GUI_GridApplyScroll(Rectangle shape)
 {
     Rectangle result = (Rectangle){
         .x      = shape.x,
-        .y      = shape.y,
+        .y      = shape.y + GUI_CTX.temp->grid.current_scroll,
         .width  =  shape.width,
         .height = shape.height
     };

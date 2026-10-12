@@ -164,7 +164,9 @@ void GUI_DrawWindow(GUI_Window* window,  EGUI_ControlStatus status, EGUI_Font fo
     if (workspace.height < window->content_height) {
         float ratio = workspace.height / window->content_height;
         float bar_h = ratio * workspace.height;
-        float bar_y = workspace.y + (window->scroll_offset / window->content_height) * workspace.height;
+        float scroll_max = window->content_height - workspace.height;
+        float bar_travel = workspace.height - bar_h;
+        float bar_y = workspace.y + (scroll_max > 0.0f ? window->scroll_offset / scroll_max * bar_travel : 0.0f);
 
         DrawRectangleRec((Rectangle){
             workspace.x + workspace.width,
@@ -272,11 +274,11 @@ void GUI_UpdateAndDrawWindow(GUI_Window *window, Rectangle limits)
         window->scroll_offset = 0;
     } else {
         workspace.width -= border * scale * 3; // Reserve some space
-        if (is_cursor_over) {
+        if (is_window_target && CheckCollisionPointRec(mouse, workspace)) {
             float wheel = GetMouseWheelMove();
             if (wheel != 0.0f) window->scroll_offset -= wheel * GUI_SCROLL_SPEED;
         }
-        window->scroll_offset = Clamp(window->scroll_offset, 0, window->content_height - workspace.height);
+        window->scroll_offset = GUI_ClampScroll(window->scroll_offset, window->content_height, workspace.height);
     }
     window->workspace = workspace;
 
