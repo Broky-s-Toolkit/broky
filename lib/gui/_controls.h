@@ -38,6 +38,7 @@ bool GUI_ButtonMenuContents(int x, int x_end, int start_row, EGUI_ThemeColor col
 // > TEXT
 void GUI_DrawText(GUI_Box box, const char* text);
 void GUI_Text(GUI_Box box, const char* text);
+void GUI_TextWrapped(GUI_Box box, const char* text);
 // > INPUTS
 void GUI_DrawInput(GUI_Box box, char* buffer, int blink_cursor, EGUI_ControlStatus status, bool blink);
 void GUI_Input(GUI_Box box, void *owner, char *buffer, int buffer_size, EGUI_InputType type);
@@ -524,6 +525,63 @@ void GUI_Text(GUI_Box box, const char* text)
 {
     GUI_DrawText(box, text);
 }
+
+void GUI_TextWrapped(GUI_Box box, const char* text)
+{
+    if (text == NULL || box.shape.width <= 0.0f || box.shape.height <= 0.0f) return;
+    GUI_FontSetup *font_setup = GUI_GetFontSetup(box.opt.font);
+    GUI_ThemeColors colors = GUI_GetThemeColors(box.opt.colors);
+    float scale = GUI_CTX.state->scale;
+    float border = font_setup->border * scale;
+    float available = box.shape.width - border * 2.0f;
+    float line_height = GUI_MeasureText("Ag", box.opt.font, scale).y;
+    char line[512] = { 0 };
+    int line_size = 0;
+    float y = box.shape.y + border;
+
+    GUI_BeginInnerControlScissor(box.shape, font_setup->border, scale);
+    const char *cursor = text;
+    while (*cursor != '\0' && y + line_height <= box.shape.y + box.shape.height) {
+        const char *word = cursor;
+        while (*cursor != '\0' && *cursor != ' ' && *cursor != '\n') cursor++;
+        int word_size = (int)(cursor - word);
+        int separator = line_size > 0 ? 1 : 0;
+        int candidate_size = line_size + separator + word_size;
+        if (candidate_size >= (int)sizeof(line)) candidate_size = (int)sizeof(line) - 1;
+        char saved[512];
+        memcpy(saved, line, sizeof(line));
+        if (separator && line_size < (int)sizeof(line) - 1) line[line_size++] = ' ';
+        int copy_size = word_size;
+        if (copy_size > (int)sizeof(line) - 1 - line_size) copy_size = (int)sizeof(line) - 1 - line_size;
+        memcpy(line + line_size, word, (size_t)copy_size);
+        line_size += copy_size;
+        line[line_size] = '\0';
+
+        bool forced_break = *cursor == '\n';
+        bool wrapped = GUI_MeasureText(line, box.opt.font, scale).x > available && separator;
+        if (wrapped) {
+            memcpy(line, saved, sizeof(line));
+            line_size -= separator + copy_size;
+            line[line_size] = '\0';
+            GUI_DrawAdjustedTextEx(line, (Vector2){ box.shape.x + border, y }, colors.tx_color_0, scale, box.opt.font);
+            y += line_height;
+            line_size = copy_size;
+            memcpy(line, word, (size_t)copy_size);
+            line[line_size] = '\0';
+        }
+        if (forced_break) {
+            GUI_DrawAdjustedTextEx(line, (Vector2){ box.shape.x + border, y }, colors.tx_color_0, scale, box.opt.font);
+            y += line_height;
+            line_size = 0;
+            line[0] = '\0';
+        }
+        if (*cursor != '\0') cursor++;
+    }
+    if (line_size > 0 && y + line_height <= box.shape.y + box.shape.height) {
+        GUI_DrawAdjustedTextEx(line, (Vector2){ box.shape.x + border, y }, colors.tx_color_0, scale, box.opt.font);
+    }
+    EndScissorMode();
+}
 // < END TEXT
 
 // > INPUTS
@@ -601,195 +659,131 @@ void GUI_DrawInput(
     EndScissorMode();
 }
 
-void GUI_Input(
-    GUI_Box box, void *owner, char *buffer, int buffer_size,
-    EGUI_InputType type)
+static float GUI_InputMeasurePrefix(char *buffer, int byte_count, EGUI_Font font)
+{
+    char saved = buffer[byte_count];
+    buffer[byte_count] = '\0';
+    float width = GUI_MeasureAdjustedText(buffer, font).x;
+    buffer[byte_count] = saved;
+    return width;
+}
+
+void GUI_Input(GUI_Box box, void *owner, char *buffer, int buffer_size, EGUI_InputType type)
 {
     Rectangle shape = box.shape;
+    Assert(owner != NULL);
     Assert(buffer != NULL);
     Assert(buffer_size > 0);
-    int max_text_size = buffer_size - 1;
 
-    GUI_BASE_CONTROL_FOCUSED(owner, shape)
-
-    // Blink (text cursor)
-    static void *last_control_focus_ptr = NULL;
-
+    GUI_Id id = GUI_MakeControlId(shape, owner, "input");
+    bool navigation_focused = GUI_RegisterNavigation(id, shape);
+    bool is_cursor_over = GUI_CheckCollisionCursorControlWin(shape);
+    bool mouse_pressed = IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !GUI_CTX.temp->pointer_press_consumed;
+    bool confirm = navigation_focused
+        && (IsKeyPressed(KEY_ENTER)
+            || (GUI_CTX.state->gamepad_navigation && IsGamepadAvailable(0)
+                && IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)));
+    bool just_focused = (is_cursor_over && mouse_pressed) || confirm;
+    if (just_focused) {
+        GUI_CTX.temp->control_focus_ptr = owner;
+        GUI_CTX.state->navigation_focus = id;
+        if (GUI_CTX.state->text_input_hook != NULL) GUI_CTX.state->text_input_hook(owner, shape);
+    }
+    bool is_focused = GUI_CTX.temp->control_focus_ptr == owner;
     if (is_cursor_over) {
         GUI_CTX.temp->cursor = EGUI_Cursor_Text;
+        GUI_CTX.temp->cursor_over_gui = true;
     }
 
-    // Blink data
-    const float     blink_speed     = 0.5f;
-    static float    blink_timer     = 0.0f;
-    static bool     blink_state     = 0;
-    static int      blink_cursor    = 0;
+    EGUI_Font font = box.opt.font;
+    if (font < 0 || font >= EGUI_Font_Count) font = GUI_GetFont();
+    GUI_InputState *edit = GUI_GetInputState(owner);
+    int text_size = (int)strlen(buffer);
+    edit->cursor = Clamp(edit->cursor, 0, text_size);
+    edit->anchor = Clamp(edit->anchor, 0, text_size);
 
-    // Font type
-    EGUI_Font font         = box.opt.font;
-    if (font < 0 || font >= EGUI_Font_Count) {
-        font = GUI_GetFont();
-    }
-
-    // Gain focus
-    if (just_focused) {
-        // Activate blink cursor
-        blink_state = true;
-        blink_timer = 0;
-
-        // Re-locate cursor
-        if (last_control_focus_ptr != buffer) {
-            blink_cursor = 0;
+    if (just_focused && is_cursor_over) {
+        float mouse_x = GUI_CTX.temp->cursor_current.x - shape.x + edit->scroll_x;
+        edit->cursor = 0;
+        while (edit->cursor < text_size) {
+            int next = GUI_Utf8Next(buffer, text_size, edit->cursor);
+            float midpoint = (GUI_InputMeasurePrefix(buffer, edit->cursor, font)
+                + GUI_InputMeasurePrefix(buffer, next, font)) * 0.5f;
+            if (mouse_x < midpoint) break;
+            edit->cursor = next;
         }
-        last_control_focus_ptr = buffer;
-
-        float mouse_x   = GUI_CTX.temp->cursor_current.x - shape.x;
-        int text_size   = StringSize(buffer);
-        bool right_test = mouse_x > GUI_MeasureAdjustedText(buffer, font).x;
-        if (right_test) {
-            blink_cursor = text_size;
-        } else {
-            for (blink_cursor = 0; blink_cursor < text_size; blink_cursor++) {
-                float w = GUI_MeasureAdjustedText(TextSubtext(buffer, 0, blink_cursor), font).x;
-                if (mouse_x < w) break;
-            }
-            // Move one position to the left for a more accurate mouse-to-text alignment
-            blink_cursor = IntMax(0, --blink_cursor);
-        }
+        edit->anchor = edit->cursor;
     }
 
-    // Focused
     if (is_focused) {
-        int text_size = StringSize(buffer);
-        blink_cursor = Clamp(blink_cursor, 0, text_size);
-
-        // Handle text input
-        int key = GetCharPressed();
-        while (key > 0) {
-            // Special cases
-            //
-            if (type == EGUI_Input_Int || type == EGUI_Input_Float) {
-                if (key == '-') {
-                    // Remove minus
-                    if (buffer[0] == '-') {
-                        int len = StringSize(buffer);
-                        for (int i = 0; i < len; i++)
-                            buffer[i] = buffer[i + 1];
-                        blink_cursor--;
-                        if (blink_cursor < 0) blink_cursor = 0;
-                    // Add minus
-                    } else {
-                        int len = StringSize(buffer);
-                        if (len < max_text_size) {
-                            for (int i = len; i >= 0; i--)
-                                buffer[i + 1] = buffer[i];
-                            buffer[0] = '-';
-                            blink_cursor++;
-                        }
-                    }
-
-                    // Already handled, skip.
-                    key = GetCharPressed();
-                    continue;
-                }
+        bool control = IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL);
+        bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
+        if (control && IsKeyPressed(KEY_A)) {
+            edit->anchor = 0;
+            edit->cursor = text_size;
+        }
+        if (control && (IsKeyPressed(KEY_C) || IsKeyPressed(KEY_X)) && edit->cursor != edit->anchor) {
+            int first = edit->cursor < edit->anchor ? edit->cursor : edit->anchor;
+            int last = edit->cursor > edit->anchor ? edit->cursor : edit->anchor;
+            char saved = buffer[last];
+            buffer[last] = '\0';
+            SetClipboardText(buffer + first);
+            buffer[last] = saved;
+            if (IsKeyPressed(KEY_X)) GUI_TextDeleteRange(buffer, &edit->cursor, &edit->anchor);
+        }
+        if (control && IsKeyPressed(KEY_V)) {
+            const char *clipboard = GetClipboardText();
+            if (clipboard != NULL && type == EGUI_Input_Text) {
+                GUI_TextInsertUtf8(buffer, buffer_size, &edit->cursor, &edit->anchor,
+                    clipboard, (int)strlen(clipboard));
             }
-
-            // Default cases
-            bool valid = false;
-            switch (type) {
-            case EGUI_Input_Text:
-                valid = (key >= 32 && key <= 126);
-                break;
-            case EGUI_Input_Int:
-                if ((key >= '0' && key <= '9')) {
-                    valid = true;
-                }
-                break;
-            case EGUI_Input_Float:
-                if ((key >= '0' && key <= '9') ||
-                    (key == '.' && strchr(buffer, '.') == NULL)) {
-                    valid = true;
-                }
-                break;
-            }
-
-            if (valid && text_size < max_text_size) {
-                // Move chars to the right
-                for (int i = text_size; i >= blink_cursor; i--) {
-                    buffer[i + 1] = buffer[i];
-                }
-                buffer[blink_cursor] = (char)key;
-                (blink_cursor)++;
-                text_size++;
-            }
-            key = GetCharPressed();
         }
 
-        // Erase
-        if (IsKeyPressed(KEY_BACKSPACE) && blink_cursor > 0) {
-            for (int i = blink_cursor - 1; i < text_size; i++) {
-                buffer[i] = buffer[i+1];
+        int codepoint = GetCharPressed();
+        while (codepoint > 0) {
+            bool valid = type == EGUI_Input_Text
+                ? codepoint >= 32
+                : (codepoint >= '0' && codepoint <= '9')
+                    || (codepoint == '-' && edit->cursor == 0 && strchr(buffer, '-') == NULL)
+                    || (type == EGUI_Input_Float && codepoint == '.' && strchr(buffer, '.') == NULL);
+            if (valid) {
+                char encoded[4];
+                int encoded_size = GUI_Utf8Encode(codepoint, encoded);
+                GUI_TextInsertUtf8(buffer, buffer_size, &edit->cursor, &edit->anchor, encoded, encoded_size);
             }
-            blink_cursor--;
-            text_size--;
-        }
-        if (IsKeyPressed(KEY_DELETE) && blink_cursor < text_size) {
-            for (int i = blink_cursor; i < text_size; i++) {
-                buffer[i] = buffer[i+1];
-            }
-            text_size--;
+            codepoint = GetCharPressed();
         }
 
-        // Cursor movement
-        if (IsKeyPressed(KEY_LEFT) && blink_cursor > 0)
-            blink_cursor--;
-        if (IsKeyPressed(KEY_RIGHT) && blink_cursor < text_size)
-            blink_cursor++;
-        if (IsKeyPressed(KEY_HOME))
-            blink_cursor = 0;
-        if (IsKeyPressed(KEY_END))
-            blink_cursor = text_size;
+        if (IsKeyPressed(KEY_BACKSPACE)) GUI_TextBackspace(buffer, &edit->cursor, &edit->anchor);
+        if (IsKeyPressed(KEY_DELETE)) GUI_TextDelete(buffer, &edit->cursor, &edit->anchor);
+        text_size = (int)strlen(buffer);
+        if (IsKeyPressed(KEY_LEFT)) edit->cursor = GUI_Utf8Prev(buffer, edit->cursor);
+        if (IsKeyPressed(KEY_RIGHT)) edit->cursor = GUI_Utf8Next(buffer, text_size, edit->cursor);
+        if (IsKeyPressed(KEY_HOME)) edit->cursor = 0;
+        if (IsKeyPressed(KEY_END)) edit->cursor = text_size;
+        if (!shift && (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_RIGHT)
+            || IsKeyPressed(KEY_HOME) || IsKeyPressed(KEY_END))) edit->anchor = edit->cursor;
 
-        // Blink update
-        if (blink_state)
-            blink_timer += GetFrameTime();
-        else
-            blink_timer -= GetFrameTime();
-        // Blink loop
-        if (blink_timer > blink_speed)
-            blink_state = 0;
-        if (blink_timer < 0)
-            blink_state = 1;
+        edit->blink_timer += GetFrameTime();
+        if (edit->blink_timer >= 1.0f) edit->blink_timer -= 1.0f;
     }
 
-    EGUI_ControlStatus status =
-        is_focused      ? EGUI_ControlStatus_Focused :
-        is_cursor_over ? EGUI_ControlStatus_Collide :
-                          EGUI_ControlStatus_Default;
-
-    GUI_DrawInput(box, buffer, blink_cursor, status, blink_state);
+    EGUI_ControlStatus status = is_focused ? EGUI_ControlStatus_Focused
+        : (is_cursor_over ? EGUI_ControlStatus_Collide : EGUI_ControlStatus_Default);
+    GUI_DrawInput(box, buffer, edit->cursor, status, edit->blink_timer < 0.5f);
 }
 
 void GUI_Float(GUI_Box box, float *value, float min, float max)
 {
-    static char buf_default[256] = {0};
-    static char buf_focused[256] = {0};
-    GUI_BASE_CONTROL_FOCUSED(value, box.shape)
+    GUI_InputState *edit = GUI_GetInputState(value);
+    bool was_focused = GUI_CTX.temp->control_focus_ptr == value;
+    if (!was_focused) snprintf(edit->scratch, sizeof(edit->scratch), "%.6g", (double)*value);
 
-    if (just_focused) {
-        snprintf(buf_focused, sizeof(buf_focused), "%.6g", (double)*value);
-    } else {
-        snprintf(buf_default, sizeof(buf_default), "%.6g", (double)*value);
-    }
-    char *buf = is_focused ? buf_focused : buf_default;
+    GUI_Input(box, value, edit->scratch, (int)sizeof(edit->scratch), EGUI_Input_Float);
 
-    GUI_Input(box, value, buf,
-        sizeof(buf_default) /* Intentionally not using buf */,
-        EGUI_Input_Float);
-
-    if (is_focused) {
+    if (GUI_CTX.temp->control_focus_ptr == value) {
         float parsed;
-        if (ParseFloatStrict(buf, &parsed)) {
+        if (ParseFloatStrict(edit->scratch, &parsed)) {
             *value = Clamp(parsed, min, max);
         }
     }
