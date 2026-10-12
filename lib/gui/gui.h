@@ -161,9 +161,17 @@ void GUI_BeginDraw(EGUI_Cursor cursor_style)
 
     GUI_CTX.temp->cursor            = cursor_style;
     GUI_CTX.temp->cursor_over_gui   = false;
+    GUI_CTX.temp->pointer_press_consumed = false;
     GUI_CTX.temp->cursor_current    = LimitVector2Rect(GetMousePosition(), GetScreenRect());
 
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        GUI_Overlay *overlay = &GUI_CTX.temp->overlay;
+        if (overlay->id_ptr != NULL
+            && !CheckCollisionPointRec(GUI_CTX.temp->cursor_current, overlay->final_shape)
+            && !CheckCollisionPointRec(GUI_CTX.temp->cursor_current, overlay->anchor_shape)) {
+            GUI_OverlayClose();
+            GUI_CTX.temp->pointer_press_consumed = true;
+        }
         GUI_CTX.temp->control_focus_ptr = NULL;
     }
 }

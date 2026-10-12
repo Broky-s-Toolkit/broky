@@ -30,6 +30,7 @@ GUI_Overlay GUI_MakeOverlay(void)
         .colors             = EGUI_ThemeColor_Gray,
         .just_enabled       = false,
         .final_shape        = (Rectangle){0,0,0,0},
+        .anchor_shape       = (Rectangle){0,0,0,0},
         .is_drawing         = false,
         .function           = NULL,
     };
@@ -76,6 +77,8 @@ void GUI_OverlayOpenFor(const void* id)
 {
     Assert(id != NULL);
     GUI_CTX.temp->overlay.id_ptr            = id;
+    GUI_CTX.state->navigation_focus         = 0;
+    GUI_CTX.temp->control_focus_ptr         = NULL;
 }
 
 void GUI_OverlaySetDrawCall(bool just_enabled, EGUI_ThemeColor colors, void (*draw_function)(void))
@@ -121,16 +124,10 @@ void GUI_BeginOverlay(bool force_overflow, bool restore_grid)
 
 void GUI_EndOverlay(Rectangle final_shape)
 {
-    bool interacted     = IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
-    bool interactable   = GUI_OverlayWasJustEnabled() == false;
-    if (interacted && interactable) {
-        GUI_OverlayClose();
-    } else {
-        GUI_OverlaySetFinalShape(final_shape);
-        #if DEV_DEBUG_GUI_OVERLAY
-            DrawDebugRect(final_shape, RED);
-        #endif
-    }
+    GUI_OverlaySetFinalShape(final_shape);
+    #if DEV_DEBUG_GUI_OVERLAY
+        DrawDebugRect(final_shape, RED);
+    #endif
     // End drawing
     GUI_CTX.temp->overlay.is_drawing = false;
 }
