@@ -5,11 +5,14 @@
  #include "global.h"
 #endif
 
+#include "_logic.h"
+
 
 #define GUI_MAX_TRAIL       30
 #define GUI_MIN_WIN_RECT    (Rectangle){ 0, 0, 320.f, 240.f }
 #define GUI_MAX_OPEN_WINS   16
 #define GUI_MAX_TEXTBOXES   256
+#define GUI_MAX_NAV_ITEMS   256
 #define GUI_SCROLL_SPEED    16
 #define GUI_NO_WIN          (-1)
 
@@ -207,6 +210,15 @@ typedef struct {
     float           height;
 } GUI_Pin;
 
+typedef struct {
+    const void *owner;
+    int cursor;
+    int anchor;
+    float scroll_x;
+    float blink_timer;
+    char scratch[64];
+} GUI_InputState;
+
 GUI_Box             GUI_MakeBox(Rectangle shape);
 GUI_Box             GUI_MakeBoxColor(Rectangle shape, EGUI_ThemeColor color);
 GUI_Box             GUI_MakeBoxEx(Rectangle shape, GUI_Opt opt);
@@ -358,6 +370,7 @@ typedef struct {
     EGUI_ThemeColor colors;             // Colors when the overlay draw was queued
     bool            just_enabled;       // TRUE if the overlay was JUST ENABLED on this frame
     Rectangle       final_shape;        // Final shape of the overlay
+    Rectangle       anchor_shape;       // Control which opened the overlay
     bool            is_drawing;         // True if *function is being executed
     void            (*function)(void);  // Draw function
 }  GUI_Overlay;
@@ -376,7 +389,10 @@ typedef struct {
     Vector2         cursor_last;
     Vector2         cursor_current;
     bool            cursor_over_gui;                // True if the pointer is over any of the elements in the GUI
+    bool            pointer_press_consumed;
     Vector2         cursor_trail[GUI_MAX_TRAIL];
+    GUI_NavItem     nav_items[GUI_MAX_NAV_ITEMS];
+    int             nav_count;
     // Window
     int                 window_current_id;          // ID of the window that is being processed
     int                 window_target_id;           // Targeted window. SEE: UPDATE WINDOW TARGET ID inside _window.h
@@ -387,6 +403,16 @@ typedef struct {
     RenderTexture2D buffer;
     float           scale;
     int             force_z_index;
+
+    GUI_Id          active_control;
+    GUI_Id          navigation_focus;
+    GUI_NavItem     nav_items[GUI_MAX_NAV_ITEMS];
+    int             nav_count;
+    bool            gamepad_navigation;
+    bool            nav_axis_x_held;
+    bool            nav_axis_y_held;
+    void            (*text_input_hook)(void *owner, Rectangle shape);
+    GUI_InputState  input_states[GUI_MAX_TEXTBOXES];
 
     GUI_Window      window_s[GUI_MAX_OPEN_WINS];
 
@@ -409,6 +435,7 @@ static struct {
 // > CONTEXT
 GUI_State       GUI_MakeStateDefault(Vector2 screen_max);
 GUI_Temp        GUI_MakeTempDefault(void);
+void            GUI_UnloadState(GUI_State *state);
 void            GUI_SetContext(GUI_State* state, GUI_Setup* setup, GUI_Temp* temp);
 GUI_State*      GUI_GetState(void);
 GUI_Setup*      GUI_GetSetup(void);
@@ -419,11 +446,18 @@ void            GUI_AfterWindowContents(GUI_Window* window);
 bool            GUI_IsCursorOverGui(void);
 bool            GUI_IsCurrentWindowTarget(int window_id);
 bool            GUI_IsCursorOverOverlay(void);
+bool            GUI_WantsKeyboard(void);
 // > FRAME PIPELINE
 void            GUI_BeginDraw(EGUI_Cursor cursor_style);
 void            GUI_ResetStyleDefaults(void);
 void            GUI_EndDraw(void);
+void            GUI_SetGamepadNavigationEnabled(bool enabled);
+void            GUI_SetTextInputHook(void (*hook)(void *owner, Rectangle shape));
+void            GUI_ClearFocus(void);
 // > CONTROL HELPERS
+GUI_Id          GUI_MakeControlId(Rectangle shape, const void *owner, const char *label);
+bool            GUI_RegisterNavigation(GUI_Id id, Rectangle shape);
+GUI_InputState* GUI_GetInputState(const void *owner);
 bool            GUI_CheckCollisionCursorControl(Rectangle shape, GUI_Window *window);
 bool            GUI_CheckCollisionCursorControlWin(Rectangle shape);
 Rectangle       GUI_ControlShapeCut(Rectangle shape, float border, float scale, bool intersect_window);
@@ -436,6 +470,48 @@ GUI_Window*     GUI_GetWindow(int id);
 // < FROM _SUBMODULES
 
 // > CONTROL HELPERS
+GUI_Id GUI_MakeControlId(Rectangle shape, const void *owner, const char *label)
+{
+    GUI_Id id = GUI_IdHashBytes(0, &GUI_CTX.temp->window_current_id, sizeof(GUI_CTX.temp->window_current_id));
+    if (owner != NULL) {
+        uintptr_t owner_value = (uintptr_t)owner;
+        id = GUI_IdHashBytes(id, &owner_value, sizeof(owner_value));
+    } else {
+        id = GUI_IdHashBytes(id, &shape, sizeof(shape));
+        id = GUI_IdHashString(id, label);
+    }
+    return id;
+}
+
+bool GUI_RegisterNavigation(GUI_Id id, Rectangle shape)
+{
+    if (GUI_CTX.temp->overlay.id_ptr != NULL && !GUI_CTX.temp->overlay.is_drawing) return false;
+    if (GUI_CTX.temp->nav_count < GUI_MAX_NAV_ITEMS) {
+        GUI_CTX.temp->nav_items[GUI_CTX.temp->nav_count++] = (GUI_NavItem){
+            id, shape.x, shape.y, shape.width, shape.height
+        };
+    }
+    return GUI_CTX.state->navigation_focus == id;
+}
+
+GUI_InputState *GUI_GetInputState(const void *owner)
+{
+    GUI_InputState *empty = NULL;
+    for (int i = 0; i < GUI_MAX_TEXTBOXES; ++i) {
+        GUI_InputState *state = &GUI_CTX.state->input_states[i];
+        if (state->owner == owner) return state;
+        if (state->owner == NULL && empty == NULL) empty = state;
+    }
+    if (empty != NULL) {
+        empty->owner = owner;
+        return empty;
+    }
+    GUI_InputState *reused = &GUI_CTX.state->input_states[(GUI_Id)(uintptr_t)owner % GUI_MAX_TEXTBOXES];
+    memset(reused, 0, sizeof(*reused));
+    reused->owner = owner;
+    return reused;
+}
+
 bool GUI_CheckCollisionCursorControl(Rectangle shape, GUI_Window *window)
 {
     GUI_State *state    = GUI_CTX.state;
