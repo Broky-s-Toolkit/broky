@@ -162,12 +162,15 @@ int main(void) {
 
         float dt = GetFrameTime();
         Labs_Update(&labs, dt);
-        player->movement    = move;
-        GAME_StepPhysics(&game_state, dt);
-        camera->target = RectCenter(player->shape);
+        bool western_active = Labs_IsActive(&labs, LAB_WESTERN);
+        if (!western_active) {
+            player->movement = move;
+            GAME_StepPhysics(&game_state, dt);
+            camera->target = RectCenter(player->shape);
+        }
 
         // Animate
-        float speed = Vector2Length(player->movement);
+        float speed = western_active ? 0.0f : Vector2Length(player->movement);
         if (speed > 0.01f)
             player->anim_time   += dt * speed * 2;
         else
@@ -187,8 +190,9 @@ int main(void) {
             ClearBackground(BLANK);
             Labs_Draw(&labs, &lab_context);
 
-            // Game world
-            BeginMode2D(*camera);
+            // Game world (the western lab owns the whole canvas while active)
+            if (!western_active) BeginMode2D(*camera);
+            if (!western_active) {
                 bool collisions[CHARACTERS];
                 float radius = 30.0f;
                 GAME_UpdateCollisions(collisions, radius);
@@ -204,7 +208,8 @@ int main(void) {
                     DrawCharacter(character->shape, character->movement, anim_phase, character->color);
                     DrawRectangleLinesEx(character->shape, 1.0f, box_color);
                 }
-            EndMode2D();
+            }
+            if (!western_active) EndMode2D();
         EndTextureMode();
 
 

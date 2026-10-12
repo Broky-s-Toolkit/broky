@@ -7,10 +7,12 @@
 
 #include "lab_wallpaper.h"
 #include "sprites-paralax.h"
+#include "western.h"
 
 typedef enum {
     LAB_WALLPAPER,
     LAB_PARALLAX,
+    LAB_WESTERN,
     LAB_COUNT
 } ELabType;
 
@@ -39,6 +41,7 @@ typedef struct {
     union {
         WallpaperLab       wallpaper;
         SpritesParallaxLab parallax;
+        WesternLab         western;
     } state;
 } LabEntry;
 
@@ -48,6 +51,7 @@ typedef struct {
 
 void Labs_Init(Labs *labs);
 void Labs_SetActive(Labs *labs, ELabType type, bool active);
+bool Labs_IsActive(const Labs *labs, ELabType type);
 void Labs_Update(Labs *labs, float dt);
 void Labs_Draw(Labs *labs, const LabDrawContext *context);
 void Labs_Unload(Labs *labs);
@@ -86,6 +90,21 @@ static void LabParallaxUnload(void *state)
     SpritesParallaxUnload((SpritesParallaxLab *)state);
 }
 
+static void LabWesternUpdate(void *state, float dt)
+{
+    WesternUpdate((WesternLab *)state, dt);
+}
+
+static void LabWesternDraw(void *state, const LabDrawContext *context)
+{
+    WesternDraw((const WesternLab *)state, context->width, context->height);
+}
+
+static void LabWesternUnload(void *state)
+{
+    WesternUnload((WesternLab *)state);
+}
+
 void Labs_Init(Labs *labs)
 {
     *labs = (Labs){ 0 };
@@ -105,11 +124,22 @@ void Labs_Init(Labs *labs)
     parallax->type           = LAB_PARALLAX;
     parallax->state.parallax = SpritesParallaxLoad();
     parallax->runtime        = (Lab){
-        .active = true,
+        .active = false,
         .state  = &parallax->state.parallax,
         .update = LabParallaxUpdate,
         .draw   = LabParallaxDraw,
         .unload = LabParallaxUnload
+    };
+
+    LabEntry *western = &labs->entries[LAB_WESTERN];
+    western->type          = LAB_WESTERN;
+    western->state.western = WesternLoad();
+    western->runtime       = (Lab){
+        .active = true,
+        .state  = &western->state.western,
+        .update = LabWesternUpdate,
+        .draw   = LabWesternDraw,
+        .unload = LabWesternUnload
     };
 }
 
@@ -117,6 +147,12 @@ void Labs_SetActive(Labs *labs, ELabType type, bool active)
 {
     if (type < 0 || type >= LAB_COUNT) return;
     labs->entries[type].runtime.active = active;
+}
+
+bool Labs_IsActive(const Labs *labs, ELabType type)
+{
+    if (type < 0 || type >= LAB_COUNT) return false;
+    return labs->entries[type].runtime.active;
 }
 
 void Labs_Update(Labs *labs, float dt)

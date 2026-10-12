@@ -14,7 +14,8 @@ if [ -f "${RAYLIB_DIR}/src/raylib.h" ] && [ -f "${RAYLIB_DIR}/src/libraylib.so" 
     RAYLIB_LIBS="-L${RAYLIB_DIR}/src -Wl,-rpath,${RAYLIB_DIR}/src -lraylib"
 elif pkg-config --exists raylib 2>/dev/null; then
     RAYLIB_CFLAGS="$(pkg-config --cflags raylib)"
-    RAYLIB_LIBS="$(pkg-config --libs raylib)"
+    RAYLIB_PKG_LIBDIR="$(pkg-config --variable=libdir raylib)"
+    RAYLIB_LIBS="$(pkg-config --libs raylib) -Wl,-rpath,${RAYLIB_PKG_LIBDIR}"
 else
     echo "raylib no está disponible." >&2
     echo "Sigue docs/install/steamos.md o define RAYLIB_DIR con la raíz de su código fuente." >&2
