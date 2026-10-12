@@ -67,6 +67,7 @@ int main(void) {
 
     // Game canvas
     RenderTexture2D game_canvas = LoadRenderTexture(GAME_RES_W, GAME_RES_H);
+    RenderTexture2D rain_buffer = { 0 };
     SetTextureFilter(game_canvas.texture, TEXTURE_FILTER_POINT);
 
     SetTargetFPS(60);
@@ -216,7 +217,6 @@ int main(void) {
 
 
         // FXs
-        static RenderTexture2D rain_buffer  = { 0 };
         if (rain_buffer.id == 0) {
             rain_buffer = LoadRenderTexture((int)(GetScreenWidth() / 5), (int)(GetScreenHeight() / 5 + 100));
         }
@@ -258,6 +258,11 @@ int main(void) {
 
     GAME_DestroyPhysics(&game_state);
     Labs_Unload(&labs);
+    GUI_UnloadSetup(&gui_setup);
+    GUI_UnloadState(&gui_state);
+    UnloadRenderTexture(game_canvas);
+    if (rain_buffer.id != 0) UnloadRenderTexture(rain_buffer);
+    if (wp_voronoi.id != 0) UnloadTexture(wp_voronoi);
     CloseWindow();
     return 0;
 }

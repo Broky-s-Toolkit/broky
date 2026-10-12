@@ -42,6 +42,7 @@ float               GUI_GetIconWidthForShape(Rectangle shape, float border);
 float               GUI_GetIconSmallWidth(void);
 // > COMMON
 GUI_Setup           GUI_LoadSetupDefault(void);
+void                GUI_UnloadSetup(GUI_Setup *setup);
 
 // > IMPLEMENTATION
 #ifdef IMPLEMENT_ALL
@@ -510,6 +511,29 @@ GUI_Setup GUI_LoadSetupDefault(void)
         setup.cursors[i] = GUI_LoadCursorSetupForType((EGUI_Cursor)i);
     }
     return setup;
+}
+
+void GUI_UnloadSetup(GUI_Setup *setup)
+{
+    if (setup == NULL) return;
+    Texture2D *icons[] = {
+        &setup->icons.icons.New, &setup->icons.icons.Open, &setup->icons.icons.Save,
+        &setup->icons.icons.Setup, &setup->icons.icons.Error, &setup->icons.icons.Face,
+        &setup->icons.icons.Dog, &setup->icons.icons.Close, &setup->icons.icons.CloseSmall,
+        &setup->icons.icons.MinimizeSmall, &setup->icons.icons.Layouts
+    };
+    for (unsigned int i = 0; i < sizeof(icons) / sizeof(icons[0]); ++i) {
+        if (icons[i]->id != 0) UnloadTexture(*icons[i]);
+    }
+    for (int i = 0; i < EGUI_Font_Count; ++i) {
+        GUI_FontSetup *font = &setup->fonts[i];
+        if (font->atlas.texture.id != 0) GUI_UnloadFontAtlas(&font->atlas);
+        if (font->custom.texture.id != 0) UnloadFont(font->custom);
+    }
+    for (int i = 1; i < EGUI_Cursor_Count; ++i) {
+        if (setup->cursors[i].texture.id != 0) UnloadTexture(setup->cursors[i].texture);
+    }
+    memset(setup, 0, sizeof(*setup));
 }
 // < COMMON
 #endif

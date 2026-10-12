@@ -66,6 +66,13 @@ GUI_Temp GUI_MakeTempDefault(void)
     return temp;
 }
 
+void GUI_UnloadState(GUI_State *state)
+{
+    if (state == NULL) return;
+    if (state->buffer.id != 0) UnloadRenderTexture(state->buffer);
+    memset(state, 0, sizeof(*state));
+}
+
 void GUI_SetContext(GUI_State* state, GUI_Setup* setup, GUI_Temp* temp)
 {
     // Update statuses
