@@ -272,7 +272,23 @@ float GUI_Icon(Texture2D* texture2d, GUI_Pin pin, Color tint)
 bool GUI_IconButton(Texture2D* texture2d, GUI_Pin pin, Color tint)
 {
     Rectangle shape = RectFromVector2(pin.position, pin.height, pin.height);
-    GUI_BASE_CONTROL_ACTIVATED(shape);
+    GUI_Id id = GUI_MakeControlId(shape, texture2d, "icon");
+    bool navigation_focused = GUI_RegisterNavigation(id, shape);
+    bool is_cursor_over = GUI_CheckCollisionCursorControlWin(shape);
+    bool mouse_pressed = IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !GUI_CTX.temp->pointer_press_consumed;
+    if (is_cursor_over && mouse_pressed && GUI_CTX.state->active_control == 0) {
+        GUI_CTX.state->active_control = id;
+        GUI_CTX.state->navigation_focus = id;
+    }
+    bool mouse_released = IsMouseButtonReleased(MOUSE_BUTTON_LEFT);
+    bool is_active = mouse_released && is_cursor_over && GUI_CTX.state->active_control == id;
+    if (mouse_released && GUI_CTX.state->active_control == id) GUI_CTX.state->active_control = 0;
+    bool keyboard_active = navigation_focused
+        && (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)
+            || (GUI_CTX.state->gamepad_navigation && IsGamepadAvailable(0)
+                && IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)));
+    is_active = is_active || keyboard_active;
+    if (is_cursor_over) GUI_CTX.temp->cursor_over_gui = true;
 
     GUI_Theme *theme    = &GUI_CTX.setup->theme;
     float color_change  = theme->color_change;
@@ -413,13 +429,29 @@ bool GUI_Button(
     GUI_Box box, const char* text, Texture2D* icon)
 {
     Rectangle shape = box.shape;
-    GUI_BASE_CONTROL_ACTIVATED(shape);
+    GUI_Id id = GUI_MakeControlId(shape, NULL, text);
+    bool navigation_focused = GUI_RegisterNavigation(id, shape);
+    bool is_cursor_over = GUI_CheckCollisionCursorControlWin(shape);
+    bool mouse_pressed = IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !GUI_CTX.temp->pointer_press_consumed;
+    if (is_cursor_over && mouse_pressed && GUI_CTX.state->active_control == 0) {
+        GUI_CTX.state->active_control = id;
+        GUI_CTX.state->navigation_focus = id;
+    }
+    bool mouse_released = IsMouseButtonReleased(MOUSE_BUTTON_LEFT);
+    bool is_active = mouse_released && is_cursor_over && GUI_CTX.state->active_control == id;
+    if (mouse_released && GUI_CTX.state->active_control == id) GUI_CTX.state->active_control = 0;
+    bool keyboard_active = navigation_focused
+        && (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)
+            || (GUI_CTX.state->gamepad_navigation && IsGamepadAvailable(0)
+                && IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)));
+    is_active = is_active || keyboard_active;
+    if (is_cursor_over) GUI_CTX.temp->cursor_over_gui = true;
 
     EGUI_ControlStatus status   = EGUI_ControlStatus_Default;
-    bool cursor_active          = is_cursor_over && IsMouseButtonDown(MOUSE_LEFT_BUTTON);
+    bool cursor_active          = GUI_CTX.state->active_control == id && IsMouseButtonDown(MOUSE_LEFT_BUTTON);
 
     if (is_cursor_over)  status = EGUI_ControlStatus_Collide;
-    if (cursor_active)   status = EGUI_ControlStatus_Focused;
+    if (cursor_active || navigation_focused) status = EGUI_ControlStatus_Focused;
     GUI_DrawButton(box, text, icon, status);
     // TODO@dc: improve colors DrawDebugRect(shape, ColorAlpha(is_cursor_over? RED : BLUE, 0.2));
     return is_active;
@@ -442,6 +474,7 @@ bool GUI_ButtonMenu(
 
     // Update condition
     is_open = GUI_OverlayOpenedBy(owner_id);
+    if (is_open) GUI_CTX.temp->overlay.anchor_shape = box.shape;
 
     // Update
     if (is_open) {
@@ -838,19 +871,26 @@ void GUI_Check(
     GUI_Box box, bool *value, const char *on_txt, const char *off_txt)
 {
     Rectangle shape = box.shape;
-
-    GUI_BASE_CONTROL_FOCUSED(value, shape)
-
-    // Focused
-    if (is_focused) {
-        if (is_cursor_active) {
-            // Toggle checkbox
-            *value = !(*value);
-        }
+    GUI_Id id = GUI_MakeControlId(shape, value, "check");
+    bool navigation_focused = GUI_RegisterNavigation(id, shape);
+    bool is_cursor_over = GUI_CheckCollisionCursorControlWin(shape);
+    bool mouse_pressed = IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !GUI_CTX.temp->pointer_press_consumed;
+    if (is_cursor_over && mouse_pressed && GUI_CTX.state->active_control == 0) {
+        GUI_CTX.state->active_control = id;
+        GUI_CTX.state->navigation_focus = id;
     }
+    bool mouse_released = IsMouseButtonReleased(MOUSE_BUTTON_LEFT);
+    bool activated = mouse_released && is_cursor_over && GUI_CTX.state->active_control == id;
+    if (mouse_released && GUI_CTX.state->active_control == id) GUI_CTX.state->active_control = 0;
+    activated = activated || (navigation_focused
+        && (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)
+            || (GUI_CTX.state->gamepad_navigation && IsGamepadAvailable(0)
+                && IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN))));
+    if (activated) *value = !*value;
+    if (is_cursor_over) GUI_CTX.temp->cursor_over_gui = true;
 
     EGUI_ControlStatus status =
-        is_focused      ? EGUI_ControlStatus_Focused :
+        navigation_focused ? EGUI_ControlStatus_Focused :
         is_cursor_over ? EGUI_ControlStatus_Collide :
                           EGUI_ControlStatus_Default;
     GUI_DrawCheck(box, *value, on_txt, off_txt, status);
